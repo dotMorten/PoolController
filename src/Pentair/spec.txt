@@ -1,0 +1,981 @@
+WHEN:	September 2009
+WHO:	michael.russe@cox.net
+WHAT:	Controlling an IntelliFlow VS pump sans Pentair controller.
+
+WHY:	I bought an IntelliFlow VS pump for my pool in 2007 and was surprised
+        to learn that I had to get a Pentair Controller to use most of its
+        advanced features. Granted, you can run it like a 'regular pump' by
+        switching power ON/OFF and get the benefit of a variable speed pump that
+        can regulate its flow, but you are stuck with a manual setting of the
+        flow rate on the pump.
+        Talking to Pentair, I was told out that the protocol on the RS485 bus
+        is proprietary and therefore there is no documentation available to
+        anybody.
+        The most cost effective Pentair solution to this problem is the Pentair
+        IntelliCom* controller, that will 'talk' to the pump in response to
+        activation of one of 4 inputs if the pump is in the 'right' mode. It is
+        still a $385 list solution with the only benefit being able to run
+        4 different 'Ext.Ctrl' programs on a VS or to select one of the 4 speeds
+        of a 4x160. This is, at least in my book, not good enough to justify the
+        investment, so I put this project on the shelf until I had some more
+        time to deal with this shortcoming.
+        Early 2009 research on the Internet surfaced that the hardware protocol
+        is 9600N81 and that this bus is quite active once a Pentair controller
+        is on it, which explained why one does not see any activity if one
+        looks for data in a system with just 'the pump'. It turns out the pump
+        is quite communicative once you know how to ask it for information. In
+        addition to that it will take instructions on what to do!
+        Called Pentair again, they had not changed their position on sharing
+        the protocol, this time around I was told some mambo about safety ...
+        so I decided to figure out what is so special about it, that they will
+        not share this information.
+
+HOW:	I wrote a collection of small programs on a Linux system that put me
+	into the position to monitor and log bus traffic on a life Pentair bus
+	with a controller that is running the show. All one needs is a cheap
+	RS485 adapter hooked up to a serial port of a computer. Friends chimed
+	in and sent me lots of raw data from their systems for analysis.
+
+
+
+
+HOWTO:	This collection comes with a Makefile and all the sources. A 'make'
+	does compile all programs in the current directory on a Linux 2.6.21.5
+	with make 3.81 and gcc 3.4.1. There are NO errors or warnings!
+	(FYI: on my system 'vi' is setup with 'ts=8 sw=8')
+	It helps to be fluent in 'C' and Linux to understand and modify the
+	programs. Due to portability and demonstration purposes all programs
+	are single threaded and use the 'select' system call to do multi point
+	I/O and timeouts.
+	An understanding of sockets helps, but is not really necessary. The
+	important thing is that a SOCK_DGRAM socket in Linux never returns
+	an incomplete packet on a read() call as long as the packets are small.
+	This is not true for the <tty> interface, since it is byte oriented
+	and does not do packages without a defined end of package indicator,
+	which does not exist in this application.
+
+
+APRS485 access point to RS485 network
+=====================================
+
+NAME	aprs485 - RS485 access point
+USAGE	aprs485 [-<options>] <bus>
+INFO	All programs in this collection use the servives of this access point
+	server to communicate with the RS485 half-duplex bus. The access point
+	uses datagrams for communication. It provides the ability for multiple
+	programs to share the physical RS485 bus. Programs connect to 'tabs'
+	in the access point server. All 'tabs' receive data occurring on the
+	bus and may send data to the bus.
+
+	<bus>	can be either a <tty> like '/dev/ttyS4' with a RS485 adapter or
+		an IP address of a tunnel device port. A tunnel device could be
+		the TCP port of a wireless communication endpoint.
+
+	options:
+
+	-d	Debug mode, aprs485 will not go into the background and print
+		all activity of the access point with a timestamp.
+		Hit <Escape> to terminate the program.
+
+	-p <#>	Use alternate portnumber <#> as server port (default is 10485).
+		This comes in handy if you need to run two or more instances of
+		'aprs485' on the same computer.
+
+	-l <dir> Creates log files in directory <dir>. The filenames used are
+		constructed from the current date on the machine: 'YYMMDD.log'.
+		Files are appended to and created if they don't exist. The log
+		file records are ASCII, 1 record per line. They start with the
+		date followed by a timestamp, a single character record type,
+		a size field and the message. Most messages are a hexadecimal
+		representation of data on the bus.
+
+API	'aprs485.h' contains code to support 'easy' attachment to a tab.
+	#define APRS485_API 1
+	#include "aprs485.h"
+	int main(int ac, char **av)
+	{
+		int	bd, n;
+		char	msg[128];
+
+		if ((bd = hub_at(0,0)) < 0) return -1;
+		n = read(bd,msg,sizeof(msg)); /* would be a receive */
+		if (0) write(bd,"hello",5); /* would be a send */
+		hub_dt(bd);
+		return 0;
+	}
+
+
+The protocol
+============
+
+	The protocol uses short binary packages for information exchange. The
+	packages have variable size. The minimum length is 8 bytes and the
+	theoretical maximum is 6+256+2=264 bytes. The largest I have seen on
+	a live Pentair bus is 37 bytes.
+	The format is:
+
+	<ldb> <sub> <dst> <src> <cfi> <len> [<data>] <ckh> <ckl>
+
+	10 <lpb> - leading packet byte, 0xa5
+	11 <sub> - ?
+	12 <dst> - destination address
+	13 <src> - source address
+	14 <cfi> - command/function/instruction
+	15 <len> - size of data field (may be 0!)
+	16 <data ...>
+	<ckh> - most significant byte of checksum
+	<ckl> - least significant byte of checksum
+
+	The checksum is a 16 bit unsigned sum of all bytes in the message up to
+	the checksum field.
+	Most packages are preceded by a preamble of 1 or more 0xff bytes and a
+	0x00 0xff sequence.
+
+	Every device on the bus has an address:
+	0x0f - is the broadcast address, it is used by the more sophisticated
+	       controllers as <dst> in their system status broadcasts most
+	       likely to keep queries for system status low.
+	0x1x - main controllers (IntelliComII, IntelliTouch, EasyTouch ...)
+	0x2x - remote controllers
+	0x6x - pumps, 0x60 is pump 1
+
+	Apart from unsolicited broadcasts, information exchange is done by
+	a device A sending a message to device B and device B sending an answer
+	to device A. Messages for simple exchanges only differ in the fact
+	that <dst> and <src> are swapped.
+	For example:
+		C: A5 00 60 10 04 01 ff 02 19
+		P: A5 00 10 60 04 01 ff 02 19
+	is a request from the controller to the pump to turn panel control off,
+	which enables it to send other commands to the pump. The pump confirms
+	the action in the answer.
+	The following sequence will turn panel control back on:
+		C: A5 00 60 10 04 01 00 01 1A
+		P: A5 00 10 60 04 01 00 01 1A
+
+	The interpretation of a <cfi> depends on the destination of a message,
+	meaning a <cfi> for one device might mean something else for another.
+
+	And there are exceptions to this protocol. The IntelliChlor C40 puts
+	messages on the bus that start with a 0x10 0x02 sequence, a data field,
+	a single byte checksum and a 0x10 0x03 trailer sequence... The checksum
+	is the unsigned sum over the data field + 18.
+
+	There are many <cfi>s I have seen in data dumps, the interpretation of
+	the datafield is somewhat cumbersome without knowing the system, so my
+	focus is more on messages to and from a pump.
+	However, here are some basics I found:
+	A <cfi> to a controller seems to work like this:
+	bits   <76543210>
+		00xxxxxx - ?
+		01xxxxxx - ?
+		10xxxxxx - transfer(write) <cfi>&0x3f to controller
+		           controller acknowledges the write with <0x01><0x01><cfi>
+		11xxxxxx - request <cfi>&0x3f from controller
+		           the controller broadcasts it in response
+
+	My pump is an IntelliFlow VS, it does follow instructions from an
+	IntelliComII controller, provided the external programs are setup and
+	enabled. It has to be in FILTER mode AND Started to make it go.
+	Unlike other controllers, which take over full control of the pump, the
+	IntelliComII grabs control only for a short interval of time, every 30
+	seconds, to communicate what external program to run. If all inputs are
+	off it does not even do that after it has had a respone from the pump.
+
+	The sequence for input 1 active is:
+
+		C: A500 d=60 s=10 c=04 l=01 FF       <0219> SETCTRL remote
+		P: A500 d=10 s=60 c=04 l=01 FF       <0219> CTRL is remote
+	*	C: A500 d=60 s=10 c=01 l=04 03210008 <0146> WRITE (0x0008) to 0x0321
+		P: A500 d=10 s=60 c=01 l=02 0008     <0120> VALIS (0x0008)
+		C: A500 d=60 s=10 c=04 l=01 00       <011A> SETCTRL local
+		P: A500 d=10 s=60 c=04 l=01 00       <011A> CTRL is local
+
+	*       C: A500 d=60 s=10 c=01 l=04 03210000 <013E> is a stop
+	*	C: A500 d=60 s=10 c=01 l=04 03210010 <014E> is program 2
+	*	C: A500 d=60 s=10 c=01 l=04 03210018 <0156> is program 3
+	*	C: A500 d=60 s=10 c=01 l=04 03210020 <015E> is program 4
+
+	If one quits repeating the sequence for about a minute the pump stops.
+	The IntelliComII is not aware of the status of the pump and will keep
+	repeating the sequence as long as an input is active. You can stop and
+	start the pump with the START/STOP button on the control panel anytime,
+	unless, of course, you hit the period when it is in remote control.
+
+	More decoding of binary data from an IntelliTouch controlled system
+	with a VS pump surfaced that there is a status report from the pump.
+	It is only obtainable when the pump is in remote control.
+
+		C: A500 d=60 s=10 c=07 l=00 <011C> SEND status
+		P: A500 d=10 s=60 c=07 l=0f 0A0602024A08AC120000000A000F22 <028A>
+    0    		RUN 0a   Started
+	1		MOD 06   Feature 1
+	2		PMP 02   ? drive state
+	3		PWR 024a  586 WATT
+	5		RPM 08ac 2220 RPM
+	7		GPM 12     18 GPM
+	8		PPC 00      0 %
+	9		b09 00   ? 
+	10		ERR 00   ok
+	11		b11 0a   ? 
+	12		TMR 00   0 MIN
+	13		CLK 0f22 15:34
+
+	The above sequence is embedded within the cyclic exchange of data
+	between the controller and the pump. The full cyclic sequence is:
+
+		C: A500 d=60 s=10 c=04 l=01 FF       <0219> SETCTRL remote
+		P: A500 d=10 s=60 c=04 l=01 FF       <0219> CTRL is remote
+		C: A500 d=60 s=10 c=01 l=04 02E40012 <0212> WRITE (18) to 0x02e4
+		P: A500 d=10 s=60 c=01 l=02 0012 <012A>     VALIS (18)
+		C: A500 d=60 s=10 c=05 l=01 06       <0121> SETMOD 06 (Feature 1)
+		P: A500 d=10 s=60 c=05 l=01 06       <0121> MOD is 06
+		C: A500 d=60 s=10 c=06 l=01 0A       <0126> SETRUN 0a Started
+		P: A500 d=10 s=60 c=06 l=01 0A       <0126> RUN is 0a Started
+		C: A500 d=60 s=10 c=07 l=00          <011C> SEND status
+		P: A500 d=10 s=60 c=07 l=0f 0A0602024908B1120000000A000F22 <028E>
+
+	The controller never releases the pump as long as it is in AUTO mode.
+	The display on the pump shows "Display not active..." and the LEDs
+	above FEATURE 1 and START/STOP are on. Experiments with my pump showed
+	that one can change the GPM setpoint 0x02e4 on the fly, it follows it!
+	If the controller releases the pump the cyclic sequence changes to:
+
+		C: A500 d=60 s=10 c=04 l=01 00 <011A> SETCTRL local
+		P: A500 d=10 s=60 c=04 l=01 00 <011A> CTRL is local
+
+	It is important for any serious controller implementation to know when a
+	pump runs into trouble and the Pentair IntelliFlow VS is fully capable
+	of doing that!
+
+
+Data decoder
+============
+
+NAME	padec - pabus data decoder
+USAGE	padec [-<options>] <datafile>
+INFO	Offline binary <datafile> decoder. Prints to standard output.
+	The <datafile> may be a raw dump of traffic from a Pentair
+	RS485 bus or the <logfile> of 'palog'.
+	Options (default is to 'skip it' if not set):
+	-d	decode messages
+	-s	print preamble bytes (if you really care)
+	-a	print record positions in <datafile>
+	-f <#>	print only messages from/to address <#>
+	-r	print full decode of repeated messages
+	-h	print 'palog' records
+	-t	print timestamps, only useful if data is from 'palog'
+
+
+Should you decide to experiment with the programs below ...
+
+	  	!BE WARE YOU ARE ON YOUR OWN!
+	  !! THE FOLLOWING PROGRAMS PUT DATA ON THE BUS !!
+  ! DO NOT USE THIS IF YOU ALREADY HAVE A CONTROLLER IN YOUR SYSTEM !
+  ! MAKE SURE YOU CAN KILL POWER TO THE PUMP BY A HW SWITCH ANYTIME !
+
+You will need the HW switch in case things get out of control!
+Especially when you start messing with the code and work on a live system.
+
+
+Simulator Program
+=================
+
+NAME	iFlow - IntelliFlow simulator on pabus
+USAGE	iFlow [<ap>]
+INFO	Attaches to an 'aprs485' tab and emulates bus behavior of an IntelliFlow
+	pump. This program can be used to test controller software before you
+	let it go for the real thing. It is not a full implementation, but has
+	enough to get the basic bugs out of controller programs, and then, one
+	can always add to it...
+	Program exits if you type 'q' followed by a <Return> or it receives an
+	EOT from the hub.
+
+
+Simple Controller programs
+==========================
+
+The programs in this section will exit if they detect traffic on the bus.
+
+NAME	iComII - IntelliComII emulator on pabus
+USAGE	iComII [<ap>]
+INFO	Interactive program, attaches to access point tab and emulates behavior
+	of an IntelliComII controller. It has an 'extra' feature which gives
+	you, the user, the ability to pull status from the pump. The pump will
+	will follow your commands, if the external programs are setup AND
+	it is in FILTER mode AND the START/STOP light is on.
+	The commands are:
+	q - quit
+	s - pump status
+	0 - all inputs off
+	1 - input 1 active
+	2 - input 2 active
+	3 - input 3 active
+	4 - input 4 active
+	The prompt displays the version number of the program, the count down
+	timer for the next cyclic transmission and the currently active program
+	sent to the pump.
+	Program exits if you enter the 'quit' command or it receives an EOT
+	from the hub.
+
+
+NAME	iPump - IntelliFlow controller
+USAGE	iPump [<ap>]
+INFO	Experimental interactive controller program.
+	Program exits if you enter the 'quit' command or it receives an EOT
+	from the hub.
+
+
+NAME	iPmon - IntelliFlow pump status monitor
+USAGE	iPmon [<ap>]
+INFO	Attaches to access point tab and polls pump status every 15 seconds.
+	Program exits if you enter the 'quit' command or it receives an EOT
+	from the hub.
+
+
+
+
+from https://github.com/tagyoureit/nodejs-poolController
+
+ var controllerStatusPacketFields = {
+        HOUR: 6,
+        MIN: 7,
+        EQUIP1: 8,
+        EQUIP2: 9,
+        EQUIP3: 10,
+        UOM: 15, //Celsius (4) or Fahrenheit (0); Also Service/Timeout.  See strRunMode below.
+        VALVE: 16,
+        DELAY: 18,  //64==??; 65-135 (for 50 circuits) is the circuit that is currently delayed.
+        UNKNOWN: 19, //Something to do with heat.
+        POOL_TEMP: 20,
+        SPA_TEMP: 21,
+        HEATER_ACTIVE: 22, //0=off.  32=on.  More here?
+        AIR_TEMP: 24,
+        SOLAR_TEMP: 25,
+        HEATER_MODE: 28,
+        MISC2: 32 //0=do not automatically adjust DST, 1=automatically adjust DST
+    }
+
+   // this is from the chlorinator itself = 16,2,...,16,3
+    var chlorinatorPacketFields = {
+        DEST: 2,
+        ACTION: 3
+    }
+
+var pumpPacketFields = {
+        DEST: 2,
+        FROM: 3,
+        ACTION: 4,
+        LENGTH: 5,
+        CMD: 6, //
+        MODE: 7, //?? Mode in pump status. Means something else in pump write/response
+        DRIVESTATE: 8, //?? Drivestate in pump status.  Means something else in pump write/response
+        WATTSH: 9,
+        WATTSL: 10,
+        RPMH: 11,
+        RPML: 12,
+        GPM: 13,
+        PPC: 14, //??
+        //14 Unknown
+        ERR: 15,
+        //16 Unknown
+        TIMER: 18, //Have to explore
+        HOUR: 19, //Hours
+        MIN: 20 //Mins
+    }
+
+ var pumpConfigFieldsCommon = {
+      NUMBER: 6,
+      TYPE: 7
+    }
+
+   var pumpConfigFieldsVS = {
+      PRIMINGMINS: 8,
+      UNKNOWNCONSTANT_9: 9,
+      UNUSED_10: 10,
+      CIRCUIT1: 11,
+      CIRCUIT1RPMH: 12,
+      CIRCUIT2: 13,
+      CIRCUIT2RPMH: 14,
+      CIRCUIT3: 15,
+      CIRCUIT3RPMH: 16,
+      CIRCUIT4: 17,
+      CIRCUIT4RPMH: 18,
+      CIRCUIT5: 19,
+      CIRCUIT5RPMH: 20,
+      CIRCUIT6: 21,
+      CIRCUIT6RPMH: 22,
+      CIRCUIT7: 23,
+      CIRCUIT7RPMH: 24,
+      CIRCUIT8: 25,
+      CIRCUIT8RPMH: 26,
+      PRIMERPMH: 27,
+      CIRCUIT1RPML: 28,
+      CIRCUIT2RPML: 29,
+      CIRCUIT3RPML: 30,
+      CIRCUIT4RPML: 31,
+      CIRCUIT5RPML: 32,
+      CIRCUIT6RPML: 33,
+      CIRCUIT7RPML: 34,
+      CIRCUIT8RPML: 35,
+      PRIMERPML: 36
+      // CIRCUITS 37-51 ARE ALL 0 FOR VS WITH EXTENDED CONFIG
+    }
+    var pumpConfigFieldsVF = {
+      POOLSIZE: 8,  // GALLONS
+      TURNOVERS: 9,  // PER DAY
+      UNUSED_10: 10,
+      CIRCUIT1: 11,
+      CIRCUIT1GPM: 12,
+      CIRCUIT2: 13,
+      CIRCUIT2GPM: 14,
+      CIRCUIT3: 15,
+      CIRCUIT3GPM: 16,
+      CIRCUIT4: 17,
+      CIRCUIT4GPM: 18,
+      CIRCUIT5: 19,
+      CIRCUIT5GPM: 20,
+      CIRCUIT6: 21,
+      CIRCUIT6GPM: 22,
+      CIRCUIT7: 23,
+      CIRCUIT7GPM: 24,
+      CIRCUIT8: 25,
+      CIRCUIT8GPM: 26,
+      MANUALFILTERGPM: 27,
+      MAXPRIMEFLOW: 28,
+      MAXPRIMESYSTEMTIME: 29,
+      MAXPRESSUREINCREASE: 30,
+      BACKWASHFLOW: 31,
+      BACKWASHTIME: 32,
+      RINSETIME: 33,
+      VACUUMFLOW: 34, // +1 FOR ACTUAL VALUE
+      UNUSED_35: 35,
+      VACUUMTIME: 36
+      // CIRCUITS 37-51 ARE ALL 0 FOR VF WITH EXTENDED CONFIG
+    }
+
+    var pumpConfigFieldsVSF = {
+      PRIMINGMINS: 8, // ALWAYS 0?
+      UNKNOWNCONSTANT_9: 9,
+      RPMGPMFLAG: 10,
+      CIRCUIT1: 11,
+      CIRCUIT1H: 12,
+      CIRCUIT2: 13,
+      CIRCUIT2H: 14,
+      CIRCUIT3: 15,
+      CIRCUIT3H: 16,
+      CIRCUIT4: 17,
+      CIRCUIT4H: 18,
+      CIRCUIT5: 19,
+      CIRCUIT5H: 20,
+      CIRCUIT6: 21,
+      CIRCUIT6H: 22,
+      CIRCUIT7: 23,
+      CIRCUIT7H: 24,
+      CIRCUIT8: 25,
+      CIRCUIT8H: 26,
+      PRIMERPMH: 27,  // NOT USED WITH VSF?
+      CIRCUIT1RPML: 28,
+      CIRCUIT2RPML: 29,
+      CIRCUIT3RPML: 30,
+      CIRCUIT4RPML: 31,
+      CIRCUIT5RPML: 32,
+      CIRCUIT6RPML: 33,
+      CIRCUIT7RPML: 34,
+      CIRCUIT8RPML: 35,
+      PRIMERPML: 36  // NOT USED WITH VSF?
+      // CIRCUITS 37-44 ARE ALL 255 FOR VS WITH EXTENDED CONFIG
+      // CIRCUITS 45-51 ARE ALL 0 WITH VS FOR EXTENDED CONFIG
+    }
+
+    var pumpTypeStr = {
+      0: 'None',
+      1: 'VF', // VF is really any circuit assignment between 1-63(?)
+      64: 'VSF',
+      128: 'VS'
+    }
+
+    var pumpType = {
+      NONE: 0,
+      VF: 1,
+      VSF: 64,
+      VS: 128
+    }
+
+    var namePacketFields = {
+        NUMBER: 6,
+        CIRCUITFUNCTION: 7,
+        NAME: 8,
+    }
+
+    var pumpAction = {
+        1: 'WRITE', //Write commands to pump
+        4: 'REMOTE', //Turn on/off pump control panel
+        5: 'MODE', //Set pump mode
+        6: 'RUN', //Set run mode
+        7: 'STATUS' //Request status
+    }
+
+    var strCircuitName = {
+        0: 'NOT USED',
+        1: 'AERATOR',
+        2: 'AIR BLOWER',
+        3: 'AUX 1',
+        4: 'AUX 2',
+        5: 'AUX 3',
+        6: 'AUX 4',
+        7: 'AUX 5',
+        8: 'AUX 6',
+        9: 'AUX 7',
+        10: 'AUX 8',
+        11: 'AUX 9',
+        12: 'AUX 10',
+        13: 'BACKWASH',
+        14: 'BACK LIGHT',
+        15: 'BBQ LIGHT',
+        16: 'BEACH LIGHT',
+        17: 'BOOSTER PUMP',
+        18: 'BUG LIGHT',
+        19: 'CABANA LTS',
+        20: 'CHEM. FEEDER',
+        21: 'CHLORINATOR',
+        22: 'CLEANER',
+        23: 'COLOR WHEEL',
+        24: 'DECK LIGHT',
+        25: 'DRAIN LINE',
+        26: 'DRIVE LIGHT',
+        27: 'EDGE PUMP',
+        28: 'ENTRY LIGHT',
+        29: 'FAN',
+        30: 'FIBER OPTIC',
+        31: 'FIBER WORKS',
+        32: 'FILL LINE',
+        33: 'FLOOR CLNR',
+        34: 'FOGGER',
+        35: 'FOUNTAIN',
+        36: 'FOUNTAIN 1',
+        37: 'FOUNTAIN 2',
+        38: 'FOUNTAIN 3',
+        39: 'FOUNTAINS',
+        40: 'FRONT LIGHT',
+        41: 'GARDEN LTS',
+        42: 'GAZEBO LTS',
+        43: 'HIGH SPEED',
+        44: 'HI-TEMP',
+        45: 'HOUSE LIGHT',
+        46: 'JETS',
+        47: 'LIGHTS',
+        48: 'LOW SPEED',
+        49: 'LO-TEMP',
+        50: 'MALIBU LTS',
+        51: 'MIST',
+        52: 'MUSIC',
+        53: 'NOT USED',
+        54: 'OZONATOR',
+        55: 'PATH LIGHTS',
+        56: 'PATIO LTS',
+        57: 'PERIMETER L',
+        58: 'PG2000',
+        59: 'POND LIGHT',
+        60: 'POOL PUMP',
+        61: 'POOL',
+        62: 'POOL HIGH',
+        63: 'POOL LIGHT',
+        64: 'POOL LOW',
+        65: 'SAM',
+        66: 'POOL SAM 1',
+        67: 'POOL SAM 2',
+        68: 'POOL SAM 3',
+        69: 'SECURITY LT',
+        70: 'SLIDE',
+        71: 'SOLAR',
+        72: 'SPA',
+        73: 'SPA HIGH',
+        74: 'SPA LIGHT',
+        75: 'SPA LOW',
+        76: 'SPA SAL',
+        77: 'SPA SAM',
+        78: 'SPA WTRFLL',
+        79: 'SPILLWAY',
+        80: 'SPRINKLERS',
+        81: 'STREAM',
+        82: 'STATUE LT',
+        83: 'SWIM JETS',
+        84: 'WTR FEATURE',
+        85: 'WTR FEAT LT',
+        86: 'WATERFALL',
+        87: 'WATERFALL 1',
+        88: 'WATERFALL 2',
+        89: 'WATERFALL 3',
+        90: 'WHIRLPOOL',
+        91: 'WTRFL LGHT',
+        92: 'YARD LIGHT',
+        93: 'AUX EXTRA',
+        94: 'FEATURE 1',
+        95: 'FEATURE 2',
+        96: 'FEATURE 3',
+        97: 'FEATURE 4',
+        98: 'FEATURE 5',
+        99: 'FEATURE 6',
+        100: 'FEATURE 7',
+        101: 'FEATURE 8',
+        200: 'USERNAME-01',
+        201: 'USERNAME-02',
+        202: 'USERNAME-03',
+        203: 'USERNAME-04',
+        204: 'USERNAME-05',
+        205: 'USERNAME-06',
+        206: 'USERNAME-07',
+        207: 'USERNAME-08',
+        208: 'USERNAME-09',
+        209: 'USERNAME-10'
+    }
+
+    var strCircuitFunction = {
+        0: 'Generic',
+        1: 'Spa',
+        2: 'Pool',
+        5: 'Master Cleaner',
+        7: 'Light',
+        9: 'SAM Light',
+        10: 'SAL Light',
+        11: 'Photon Gen',
+        12: 'Color Wheel',
+        13: 'Valve',
+        14: 'Spillway',
+        15: 'Floor Cleaner',
+        16: 'Intellibrite',
+        17: 'MagicStream',
+        19: 'Not Used',
+        64: 'Freeze protection on',
+        // Not exactly sure if the following belong in this list...
+        // they show up in the pump circuit assignment packets (24/27)
+        128: 'Solar',
+        129: 'Either Heater',
+        130: 'Pool Heater',
+        131: 'Spa Heater',
+        132: 'Freeze'
+    }
+
+    var strPumpActions = {
+        1: 'Pump set speed/program or run program',
+        4: 'Pump control panel',
+        5: 'Pump speed',
+        6: 'Pump power',
+        7: 'Pump Status'
+    }
+
+    var strChlorinatorActions = {
+        0: 'Get Status',
+        1: 'Response to Get Status',
+        3: 'Response to Get Version',
+        17: 'Set Salt %',
+        18: 'Response to Set Salt % & Salt PPM',
+        20: 'Get Version',
+        21: 'Set Salt Generate % / 10'
+    }
+
+    var strControllerActions = {
+        // Response/information/settings
+        1: 'Ack Message',
+        2: 'Controller Status',
+        5: 'Date/Time',
+        7: 'Pump Status',
+        8: 'Heat/Temperature Status',
+        10: 'Custom Names',
+        11: 'Circuit Names/Function',
+        16: 'Heat Pump Status?',
+        17: 'Schedule details',
+        18: 'IntelliChem',
+        19: 'Intelli(?)',  //Packet never seen...
+        22: 'Get Intelliflo Spa Side Control',
+        23: 'Pump Status',
+        24: 'Pump Config',
+        25: 'IntelliChlor Status',
+        27: 'Pump Config (Extended)',
+        29: 'Valve Status',
+        30: 'High Speed Circuits for Valve',
+        32: 'is4/is10 Settings',
+        33: 'Intelliflo Spa Side Remote settings',
+        34: 'Solar/Heat Pump Status',
+        35: 'Delay Status',
+        39: 'Light Groups/Positions',
+        40: 'Settings, Heat Mode?',  //
+
+
+        // Set commands
+        96: 'Set Color',
+        131: 'Set Delay Cancel',
+        133: 'Set Date/Time',
+        134: 'Set Circuit',
+        136: 'Set Heat/Temperature',
+        138: 'Set Custom Name',
+        139: 'Set Circuit Name/Function',
+        144: 'Set Heat Pump',
+        145: 'Set Schedule',
+        146: 'Set IntelliChem',
+        147: 'Set Intelli(?)',
+        150: 'Set Intelliflow Spa Side Control',
+        152: 'Set Pump Config',
+        153: 'Set IntelliChlor',
+        155: 'Set Pump Config (Extended)',
+        157: 'Set Valves',
+        158: 'Set High Speed Circuits for Valves',  //Circuits that require high speed
+        160: 'Set is4/is10 Spa Side Remote',
+        161: 'Set QuickTouch Spa Side Remote',
+        162: 'Set Solar/Heat Pump',
+        163: 'Set Delay',
+        167: 'Set Light Groups/Positions',
+        168: 'Set Heat Mode',  //probably more
+
+        // Get commands
+        194: 'Get Status/',
+        197: 'Get Date/Time',
+        200: 'Get Heat/Temperature',
+        202: 'Get Custom Name',
+        203: 'Get Circuit Name/Function',
+        208: 'Get Heat Pump',
+        209: 'Get Schedule',
+        210: 'Get IntelliChem',
+        211: 'Get Intelli(?)',
+        214: 'Get Inteliflo Spa Side Control',
+        215: 'Get Pump Status',
+        216: 'Get Pump Config',
+        217: 'Get IntelliChlor',
+        219: 'Get Pump Config (Extended)',
+        221: 'Get Valves',
+        222: 'Get High Speed Circuits for Valves',
+        224: 'Get is4/is10 Settings',
+        225: 'Get Intelliflo Spa Side Remote settings',
+        226: 'Get Solar/Heat Pump',
+        227: 'Get Delays',
+        231: 'Get Light group/positions',
+        232: 'Get Settings, Heat Mode?',
+        252: 'SW Version Info',
+        253: 'Get SW Version'
+    }
+
+    var lightColors = {
+        0: "White",
+        1: "Custom", // custom addition for when save/recall are used
+        2: "Light Green",
+        4: "Green",
+        6: "Cyan",
+        8: "Blue",
+        10: "Lavender",
+        12: "Magenta",
+        14: "Light Magenta"
+    }
+
+    var strIntellibriteModes = {
+        0: 'Off',
+        1: 'On',
+        128: 'Color Sync',
+        144: 'Color Swim',
+        160: 'Color Set',
+        177: 'Party',
+        178: 'Romance',
+        179: 'Caribbean',
+        180: 'American',
+        181: 'Sunset',
+        182: 'Royal',
+        190: 'Save',
+        191: 'Recall',
+        193: 'Blue',
+        194: 'Green',
+        195: 'Red',
+        196: 'White',
+        197: 'Magenta'
+    }
+    var intellibriteModes = {
+        'Off': 0,
+        'On': 1,
+        'Color Sync': 128,
+        'Color Swim': 144,
+        'Color Set': 160,
+        'Party': 177,
+        'Romance': 178,
+        'Caribbean': 179,
+        'American': 180,
+        'Sunset': 181,
+        'Royal': 182,
+        'Save': 190,
+        'Recall': 191,
+        'Blue': 193,
+        'Green': 194,
+        'Red': 195,
+        'White': 196,
+        'Magenta': 197
+    }
+
+    var strRunMode = {
+        //same bit as UOM.  Need to fix naming.
+        0: 'Auto', //0x00000000
+        1: 'Service', //0x00000001
+        4: 'Celsius', //if 1, Celsius.  If 0, Fahrenheit
+        8: 'Freeze', //0 if no freeze, 1 if freeze mode active
+        128: '/Timeout' //Timeout always appears with Service; eg this bit has not been observed to be 128 but rather 129.  Not sure if the timer is in the controller.  0x10000001
+
+    }
+
+
+    var strValve = {
+        3: 'Pool',
+        15: 'Spa',
+        48: 'Heater',
+        51: 'Solar'
+    }
+
+    var heatModeStr = {
+        //Pentair controller sends the pool and spa heat status as a 4 digit binary byte from 0000 (0) to 1111 (15).  The left two (xx__) is for the spa and the right two (__xx) are for the pool.  EG 1001 (9) would mean 10xx = 2 (Spa mode Solar Pref) and xx01 = 1 (Pool mode Heater)
+        //0: all off
+        //1: Pool heater            Spa off
+        //2: Pool Solar Pref        Spa off
+        //3: Pool Solar Only        Spa off
+        //4: Pool Off               Spa Heater
+        //5: Pool Heater            Spa Heater
+        //6: Pool Solar Pref        Spa Heater
+        //7: Pool Solar Only        Spa Heater
+        //8: Pool Off               Spa Solar Pref
+        //9: Pool Heater            Spa Solar Pref
+        //10: Pool Solar Pref       Spa Solar Pref
+        //11: Pool Solar Only       Spa Solar Pref
+        //12: Pool Off              Spa Solar Only
+        //13: Pool Heater           Spa Solar Only
+        //14: Pool Solar Pref       Spa Solar Only
+        //15: Pool Solar Only       Spa Solar Only
+        0: 'OFF',
+        1: 'Heater',
+        2: 'Solar Pref',
+        3: 'Solar Only'
+    }
+
+    var heatMode = {
+        OFF: 0,
+        HEATER: 1,
+        SOLARPREF: 2,
+        SOLARONLY: 3
+    }
+
+    var ctrl = {
+        CHLORINATOR: 2,
+        BROADCAST: 15,
+        INTELLITOUCH: 16,
+        REMOTE: 32,
+        WIRELESS: 34, //Looks like this is any communications through the wireless link (ScreenLogic on computer, iPhone...)
+        PUMP1: 96,
+        PUMP2: 97,
+        PUMP3: 98,
+        PUMP4: 99,
+        PUMP5: 100,
+        PUMP6: 101,
+        PUMP7: 102,
+        PUMP8: 103,
+        PUMP9: 104,
+        PUMP10: 105,
+        PUMP11: 106,
+        PUMP12: 107,
+        PUMP13: 108,
+        PUMP14: 109,
+        PUMP15: 110,
+        PUMP16: 111,
+        INTELLICHEM: 144
+    }
+
+    var ctrlString = {
+        2: 'Chlorinator',
+        15: 'Broadcast',
+        16: 'Main',
+        32: 'Remote',
+        33: 'PoolControllerApp', //default address
+        34: 'Wireless',
+        96: 'Pump 1',
+        97: 'Pump 2',
+        98: 'Pump 3',
+        99: 'Pump 4',
+        100: 'Pump 5',
+        101: 'Pump 6',
+        102: 'Pump 7',
+        103: 'Pump 8',
+        104: 'Pump 9',
+        105: 'Pump 10',
+        106: 'Pump 11',
+        107: 'Pump 12',
+        108: 'Pump 13',
+        109: 'Pump 14',
+        110: 'Pump 15',
+        111: 'Pump 16',
+        144: 'Intellichem',
+        appAddress: 'nodejs-poolController Server'
+    }
+
+    var schedulePacketBytes = {
+        "ID": 6,
+        "CIRCUIT": 7,
+        "TIME1": 8,
+        "TIME2": 9,
+        "TIME3": 10,
+        "TIME4": 11,
+        "DAYS": 12
+    };
+
+    var intellichemPacketFields = {
+      DEST: 2,
+      ACTION: 3,
+      PHREADINGHI: 6,
+      PHREADINGLO: 7,
+      ORPREADINGHI: 8,
+      ORPREADINGLO: 9,
+      PHSETPOINTHI: 10,
+      PHSETPOINTLO: 11,
+      ORPSETPOINTHI: 12,
+      ORPSETPOINTLO: 13,
+      TANK1: 26,
+      TANK2: 27,
+      CALCIUMHARDNESSHI: 29,
+      CALCIUMHARDNESSLO: 30,
+      CYAREADING: 32,
+      TOTALALKALINITYREADINGHI: 33,
+      TOTALALKALINITYREADINGLO: 34,
+      WATERFLOW: 36,
+      MODE1: 40,
+      MODE2: 41
+    }
+
+    /*istanbul ignore next */
+    if (container.logModuleLoading)
+        container.logger.info('Loaded: ants.js')
+
+    return {
+        packetFields: packetFields,
+        controllerStatusPacketFields: controllerStatusPacketFields,
+        controllerChlorinatorPacketFields: controllerChlorinatorPacketFields,
+        chlorinatorPacketFields: chlorinatorPacketFields,
+        pumpPacketFields: pumpPacketFields,
+        pumpType: pumpType,
+        pumpTypeStr: pumpTypeStr,
+        pumpConfigFieldsCommon: pumpConfigFieldsCommon,
+        pumpConfigFieldsVS: pumpConfigFieldsVS,
+        pumpConfigFieldsVF: pumpConfigFieldsVF,
+        pumpConfigFieldsVSF: pumpConfigFieldsVSF,
+        namePacketFields: namePacketFields,
+        pumpAction: pumpAction,
+        strCircuitName: strCircuitName,
+        strCircuitFunction: strCircuitFunction,
+        strPumpActions: strPumpActions,
+        strChlorinatorActions: strChlorinatorActions,
+        strControllerActions: strControllerActions,
+        strRunMode: strRunMode,
+        strValve: strValve,
+        heatModeStr: heatModeStr,
+        heatMode: heatMode,
+        ctrl: ctrl,
+        ctrlString: ctrlString,
+        schedulePacketBytes: schedulePacketBytes,
+        intellichemPacketFields: intellichemPacketFields,
+        strIntellibriteModes: strIntellibriteModes,
+        intellibriteModes: intellibriteModes,
+        lightColors: lightColors
+    }
+
+}
