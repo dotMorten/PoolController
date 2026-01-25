@@ -31,6 +31,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Pentair\Pentair.csproj" />
       <PackageReference Include="NoeticTools.Net2HassMqtt" Version="1.0.1" />
+      <PackageReference Include="System.Device.Gpio" Version="1.5.0" />
+      <PackageReference Include="Iot.Device.Bindings" Version="1.5.0" />
   </ItemGroup>
 
 </Project>
