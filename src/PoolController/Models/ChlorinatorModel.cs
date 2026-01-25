@@ -1,4 +1,7 @@
-internal partial class ChlorinatorModel : ObservableObject
+
+namespace PoolController.Models;
+
+public partial class ChlorinatorModel : ObservableObject
 {
     [ObservableProperty]
     private int _percentage = 25;

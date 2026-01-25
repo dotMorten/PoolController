@@ -6,9 +6,9 @@ public sealed partial class MainPage : Page
     {
         this.InitializeComponent();
 
-        var client = new Pentair.Client("COM3");
-        client.MessageReceived += (s, e) => Console.WriteLine(e);
-
-        Task<Pentair.StatusMessage> status = client.GetStatusAsync(Pentair.Client.Pump1);
+//        Task<Pentair.StatusMessage> status = client.GetStatusAsync(Pentair.Client.Pump1);
     }
+
+    public PoolService Service => PoolService.Instance;
+    public Settings Settings => Settings.Instance;
 }

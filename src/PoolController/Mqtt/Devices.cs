@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using NoeticTools.Net2HassMqtt.Configuration.Building;
 using NoeticTools.Net2HassMqtt.Configuration.UnitsOfMeasurement;
+using PoolController.Models;
 
 namespace PoolController.Mqtt;
 
@@ -38,11 +39,11 @@ internal static class Devices
                   .WithFriendlyName("Estimated Flow")
                   .WithNodeId("estimated_flow")
                   .WithUnitOfMeasurement(VolumeFlowRateSensorUoM.Galpermin))
-              .HasTimestampSensor(config => config.OnModel(model)
-                  .WithStatusProperty(nameof(PoolPumpModel.CurrentTime))
-                  .WithUnitOfMeasurement(TimestampSensorUoM.None)
-                  .WithFriendlyName("Current Time")
-                  .WithNodeId("current_time"))
+              // .HasTimestampSensor(config => config.OnModel(model)
+              //     .WithStatusProperty(nameof(PoolPumpModel.Clock))
+              //     .WithUnitOfMeasurement(TimestampSensorUoM.None)
+              //     .WithFriendlyName("Current Time")
+              //     .WithNodeId("current_time"))
               .HasEnumSensor(config => config.OnModel(model)
                   .WithStatusProperty(nameof(PoolPumpModel.State))
                   .WithFriendlyName("State")

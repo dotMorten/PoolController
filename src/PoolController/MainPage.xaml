@@ -9,10 +9,19 @@
       <StackPanel
         HorizontalAlignment="Center"
         VerticalAlignment="Center">
-        <TextBlock AutomationProperties.AutomationId="HelloTextBlock"
-          Text="Pool Controller"
-          HorizontalAlignment="Center" />
-      </StackPanel>
+                <TextBox Text="{x:Bind Settings.PumpComPort, Mode=TwoWay}" />
+                <TextBox Text="{x:Bind Settings.MqttBrokerAddress, Mode=TwoWay}" Header="MQTT Address" />
+                <TextBox Text="{x:Bind Settings.MqttUsername, Mode=TwoWay}" Header="MQTT Username" />
+                <TextBox Text="{x:Bind Settings.MqttPassword, Mode=TwoWay}" Header="MQTT Password" />
+                <ToggleSwitch IsOn="{x:Bind Settings.EnableMqtt, Mode = TwoWay}" Header="Enable MQTT" />
+
+                <TextBlock Text="Pump Power (W):" FontWeight="Bold" Margin="0,20,0,0" />
+                <TextBlock Text="{x:Bind Service.PumpStatus.Power, Mode=OneWay}" />
+                <TextBlock Text="Pump Speed (RPM):" FontWeight="Bold" Margin="0,20,0,0" />
+                <TextBlock Text="{x:Bind Service.PumpStatus.PumpSpeed, Mode=OneWay}" />
+                <TextBlock Text="Pump Clock:" FontWeight="Bold" Margin="0,20,0,0" />
+                <TextBlock Text="{x:Bind Service.PumpStatus.Clock, Mode=OneWay}" />
+            </StackPanel>
     </Grid>
   </ScrollViewer>
 </Page>

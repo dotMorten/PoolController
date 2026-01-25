@@ -10,11 +10,11 @@ namespace Pentair;
 public class Client : IDisposable
 {
     public const byte Pump1 = 0x60;
-
-    public readonly static byte[] PanelControlOff = new byte[] { 0x20, 0x04, 0x01, 0xFF };
-    public readonly static byte[] PanelControlOn = new byte[] { 0x20, 0x04, 0x01, 0x00 };
-    public readonly static byte[] RequestStatus = new byte[] { 0x20, 0x07, 0x00 };
-    public readonly static byte[] StartProgram2 = new byte[] { 0x20, 0x01, 0x04, 0x03, 0x21, 0x00, 0x20 };
+    private const byte SourceAddress = 0x20;
+    public readonly static byte[] PanelControlOff = new byte[] { SourceAddress, 0x04, 0x01, 0xFF };
+    public readonly static byte[] PanelControlOn = new byte[] { SourceAddress, 0x04, 0x01, 0x00 };
+    public readonly static byte[] RequestStatus = new byte[] { SourceAddress, 0x07, 0x00 };
+    public readonly static byte[] StartProgram2 = new byte[] { SourceAddress, 0x01, 0x04, 0x03, 0x21, 0x00, 0x20 };
 
 
     static byte[] preamble = new byte[] { 0xff, 0x00, 0xff, 0xA5, 0x00 };
@@ -115,7 +115,7 @@ public class Client : IDisposable
                     Destination = dst,
                     Source = src,
                     Command = cfi,
-                    Data = data
+                    Data = data.ToArray()
                 };
             }
             else
@@ -125,7 +125,7 @@ public class Client : IDisposable
                     Destination = dst,
                     Source = src,
                     Command = cfi,
-                    Data = data
+                    Data = data.ToArray()
                 };
             }
             MessageReceived?.Invoke(null, message);
@@ -184,7 +184,7 @@ public class Client : IDisposable
         EventHandler<Message> handler;
         handler = (s, e) =>
         {
-            if (e is StatusMessage statusMessage && statusMessage.Source == pump)
+            if (e is StatusMessage statusMessage && statusMessage.Source == pump && statusMessage.Destination == SourceAddress)
             {
                 tcs.SetResult(statusMessage);
             }

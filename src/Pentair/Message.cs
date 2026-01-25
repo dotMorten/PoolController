@@ -1,4 +1,4 @@
-﻿using System.Buffers;
+using System.Buffers;
 using System.Text;
 
 namespace Pentair;
@@ -9,29 +9,25 @@ public class Message
     public byte Destination { get; set; }
     public byte Source { get; set; }
     public byte Command { get; set; }
-    public ReadOnlySequence<byte> Data { get; set; }
+    public byte[] Data { get; set; }
     override public string ToString()
     {
         StringBuilder sb = new StringBuilder();
         sb.AppendFormat("Dst={0:X2} Src={1:X2} Cmd={2:X2} DataLen={3} Data: ", Destination, Source, Command, Data.Length);
-        foreach (var segment in Data)
+        foreach (var b in Data)
         {
-            foreach (var b in segment.Span)
-            {
-                sb.AppendFormat("{0:X2} ", b);
-            }
+            sb.AppendFormat("{0:X2} ", b);
         }
         return sb.ToString();
     }
     protected ushort GetUInt16(byte offset)
     {
-        var slice =
-        Data.Slice(offset, 2);
-        return (ushort)(slice.First.Span[0] * 256 + Data.First.Span[1]);
+        var slice = Data.AsSpan(offset, 2);
+        return (ushort)(slice[0] * 256 + slice[1]);
     }
     protected byte GetByte(byte offset)
     {
-        return Data.First.Span[offset];
+        return Data[offset];
     }
 }
 

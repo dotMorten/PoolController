@@ -1,4 +1,6 @@
-internal partial class PoolPumpModel : ObservableObject
+namespace PoolController.Models;
+
+public partial class PoolPumpModel : ObservableObject
 {
     [ObservableProperty]
     private int _pumpSpeed = 0;
@@ -10,7 +12,7 @@ internal partial class PoolPumpModel : ObservableObject
     private int _estimatedFlow = 0;
 
     [ObservableProperty]
-    private int _currentTime = 10000;
+    private TimeOnly _clock;
 
     [ObservableProperty]
     private bool _isOn;

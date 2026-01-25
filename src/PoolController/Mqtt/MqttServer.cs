@@ -8,50 +8,43 @@ using NoeticTools.Net2HassMqtt.Configuration.Building;
 
 namespace PoolController.Mqtt;
 
-internal static class MqttServer
+public class MqttServer
 {
-    static INet2HassMqttBridge? bridge;
+    INet2HassMqttBridge bridge;
 
-    internal static async Task StartServer(string address, string username, string password)
+    private MqttServer(INet2HassMqttBridge bridge)
     {
-        if (bridge != null)
-        {
-            throw new InvalidOperationException("Bridge is already configured.");
-        }
+        this.bridge = bridge;
+    }
+
+    internal static async Task<MqttServer> StartServer(string address, string username, string password)
+    {
         var appConfig = new ConfigurationBuilder().AddInMemoryCollection().Build();
         appConfig.Providers.First();
         var mqttBrokerSection = appConfig.GetSection("MqttBroker");
         mqttBrokerSection["Address"] = address;
         mqttBrokerSection["Username"] = username;
         mqttBrokerSection["Password"] = password;
-        var poolModel = new PoolPumpModel();
-        var chlorinatorModel = new ChlorinatorModel();
+        var poolModel = PoolService.Instance.PumpStatus;
+        var chlorinatorModel = PoolService.Instance.ChlorinatorStatus;
 
-        var device1 = Devices.BuildPump(poolModel, "pool_pump_a5de12fa");
+        var device1 = Devices.BuildPump(poolModel, "Pump1");
         var device2 = Devices.BuildChlorinator(chlorinatorModel);
 
         var mqttClientOptions = HassMqttClientFactory.CreateQuickStartOptions("pool_controller", appConfig);
-        bridge = new BridgeConfiguration()
+        var bridge = new BridgeConfiguration()
                      .WithMqttOptions(mqttClientOptions)
                      .HasDevice(device1)
-                     .HasDevice(device2)
+                     //.HasDevice(device2)
                      .Build();
 
-        try
-        {
             // Start the bridge
             await bridge.StartAsync();
-        }
-        finally
-        {
-            await bridge.StopAsync();
-            await Task.Delay(100);
-        }
+        return new MqttServer(bridge);
     }
-    internal static async Task StopAsync()
+
+    internal async Task StopAsync()
     {
-        if(bridge is null) return;
         await bridge.StopAsync();
-        bridge = null;
     }
 }
