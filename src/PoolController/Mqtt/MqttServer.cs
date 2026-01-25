@@ -35,11 +35,11 @@ public class MqttServer
         var bridge = new BridgeConfiguration()
                      .WithMqttOptions(mqttClientOptions)
                      .HasDevice(device1)
-                     //.HasDevice(device2)
+                     .HasDevice(device2)
                      .Build();
 
-            // Start the bridge
-            await bridge.StartAsync();
+        // Start the bridge
+        await bridge.StartAsync();
         return new MqttServer(bridge);
     }
 

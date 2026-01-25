@@ -34,9 +34,9 @@ public class Message
 
 public class StatusMessage : Message
 {
-    public byte Run => GetByte(0); //  04 if the pump has been deactivated, 0A if it is ready to pump
-    public byte Mode => GetByte(1); // the index of the program currently running
-    public byte Pmp => GetByte(2); //  pumping state, normally 02. It would be 00 in the event of an error, and 01 or 04 during priming, but we haven't had a chance to check this.
+    public PumpRunning Run => (PumpRunning)GetByte(0); //  04 if the pump has been deactivated, 0A if it is ready to pump
+    public PumpMode Mode => (PumpMode)GetByte(1); // the index of the program currently running
+    public PumpState State => (PumpState)GetByte(2); //  pumping state, normally 02. It would be 00 in the event of an error, and 01 or 04 during priming, but we haven't had a chance to check this.
     public ushort Power => GetUInt16(3);
     public ushort Rpm => GetUInt16(5);
     public byte Gpm => GetByte(7);
@@ -48,6 +48,29 @@ public class StatusMessage : Message
 
     public override string ToString()
     {
-        return $"{base.ToString()}\n\tRun: {Run}\n\tMode: {Mode}\n\tPmp: {Pmp}\n\tPower: {Power}\n\tRPM: {Rpm}\n\tGPM: {Gpm}\n\tPPC: {Ppc}\n\tError: {Error}\n\tTimer: {Timer}\n\tTime: {Clock}";
+        return $"{base.ToString()}\n\tRun: {Run}\n\tMode: {Mode}\n\tPmp: {State}\n\tPower: {Power}\n\tRPM: {Rpm}\n\tGPM: {Gpm}\n\tPPC: {Ppc}\n\tError: {Error}\n\tTimer: {Timer}\n\tTime: {Clock}";
     }
+}
+public enum PumpRunning : byte
+{
+    Started = 0x0a,
+    Stopped = 0x04
+}
+public enum PumpMode : byte
+{
+    Filter = 0x00,
+    Manual = 0x01,
+    Backwash = 0x02,
+    Feature1 = 0x06,
+    ExternalProgram1 = 0x09,
+    ExternalProgram2 = 0x0a,
+    ExternalProgram3 = 0x0b,
+    ExternalProgram4 = 0x0c,
+}
+public enum PumpState : byte
+{
+    FaultMode = 0x00,
+    Priming = 0x01,
+    Normal = 0x02,
+    SystemPriming = 0x04,
 }

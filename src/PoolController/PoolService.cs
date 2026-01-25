@@ -14,6 +14,15 @@ public class PoolService : ObservableObject
     private PoolService()
     {
         Settings.Instance.PropertyChanged += OnSettingsChanged;
+    }
+    static PoolService()
+    {
+        Instance = new PoolService();
+        Instance.Init();
+    }
+
+    private void Init()
+    {
         StartMqtt();
         StartPentairClient();
     }
@@ -90,7 +99,8 @@ public class PoolService : ObservableObject
                    // PumpStatus.Ppc = statusMessage.Ppc;
                    // PumpStatus.Error = statusMessage.Error;
                    PumpStatus.Clock = statusMessage.Clock;
-                   PumpStatus.State = (Models.PoolPumpModel.PumpState)statusMessage.Run;
+                   PumpStatus.State = statusMessage.State;
+                   PumpStatus.Running = statusMessage.Run;
                });
             }
         }
@@ -118,7 +128,7 @@ public class PoolService : ObservableObject
         }
     }
 
-    public static PoolService Instance { get; } = new PoolService();
+    public static PoolService Instance { get; }
 
     public Mqtt.MqttServer? MqttServer { get; private set; }
 

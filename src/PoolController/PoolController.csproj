@@ -30,9 +30,20 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Pentair\Pentair.csproj" />
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
       <PackageReference Include="NoeticTools.Net2HassMqtt" Version="1.0.1" />
       <PackageReference Include="System.Device.Gpio" Version="1.5.0" />
-      <PackageReference Include="Iot.Device.Bindings" Version="1.5.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="SettingsPage.xaml.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="SettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
 </Project>

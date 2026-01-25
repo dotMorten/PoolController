@@ -9,18 +9,19 @@
       <StackPanel
         HorizontalAlignment="Center"
         VerticalAlignment="Center">
-                <TextBox Text="{x:Bind Settings.PumpComPort, Mode=TwoWay}" />
-                <TextBox Text="{x:Bind Settings.MqttBrokerAddress, Mode=TwoWay}" Header="MQTT Address" />
-                <TextBox Text="{x:Bind Settings.MqttUsername, Mode=TwoWay}" Header="MQTT Username" />
-                <TextBox Text="{x:Bind Settings.MqttPassword, Mode=TwoWay}" Header="MQTT Password" />
-                <ToggleSwitch IsOn="{x:Bind Settings.EnableMqtt, Mode = TwoWay}" Header="Enable MQTT" />
-
+                <Button Content="Settings" Click="Settings_Click" />
                 <TextBlock Text="Pump Power (W):" FontWeight="Bold" Margin="0,20,0,0" />
                 <TextBlock Text="{x:Bind Service.PumpStatus.Power, Mode=OneWay}" />
                 <TextBlock Text="Pump Speed (RPM):" FontWeight="Bold" Margin="0,20,0,0" />
                 <TextBlock Text="{x:Bind Service.PumpStatus.PumpSpeed, Mode=OneWay}" />
+                <TextBlock Text="Flow (GPM):" FontWeight="Bold" Margin="0,20,0,0" />
+                <TextBlock Text="{x:Bind Service.PumpStatus.EstimatedFlow, Mode=OneWay}" />
                 <TextBlock Text="Pump Clock:" FontWeight="Bold" Margin="0,20,0,0" />
                 <TextBlock Text="{x:Bind Service.PumpStatus.Clock, Mode=OneWay}" />
+                <TextBlock Text="Run State:" FontWeight="Bold" Margin="0,20,0,0" />
+                <TextBlock Text="{x:Bind Service.PumpStatus.Running, Mode=OneWay}" />
+                <TextBlock Text="Status:" FontWeight="Bold" Margin="0,20,0,0" />
+                <TextBlock Text="{x:Bind Service.PumpStatus.State, Mode=OneWay}" />
             </StackPanel>
     </Grid>
   </ScrollViewer>

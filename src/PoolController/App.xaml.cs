@@ -22,7 +22,7 @@ public partial class App : Application
         MainWindow = new Window();
         PoolService.Instance.DispatcherQueue = MainWindow.DispatcherQueue;
 #if DEBUG
-        MainWindow.UseStudio();
+        // MainWindow.UseStudio();
 #endif
 
 
