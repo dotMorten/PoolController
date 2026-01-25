@@ -4,25 +4,27 @@
       xmlns:local="using:PoolController"
       xmlns:utu="using:Uno.Toolkit.UI"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-  <ScrollViewer IsTabStop="True">
     <Grid utu:SafeArea.Insets="VisibleBounds">
-      <StackPanel
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center">
-                <Button Content="Settings" Click="Settings_Click" />
-                <TextBlock Text="Pump Power (W):" FontWeight="Bold" Margin="0,20,0,0" />
-                <TextBlock Text="{x:Bind Service.PumpStatus.Power, Mode=OneWay}" />
-                <TextBlock Text="Pump Speed (RPM):" FontWeight="Bold" Margin="0,20,0,0" />
-                <TextBlock Text="{x:Bind Service.PumpStatus.PumpSpeed, Mode=OneWay}" />
-                <TextBlock Text="Flow (GPM):" FontWeight="Bold" Margin="0,20,0,0" />
-                <TextBlock Text="{x:Bind Service.PumpStatus.EstimatedFlow, Mode=OneWay}" />
-                <TextBlock Text="Pump Clock:" FontWeight="Bold" Margin="0,20,0,0" />
-                <TextBlock Text="{x:Bind Service.PumpStatus.Clock, Mode=OneWay}" />
-                <TextBlock Text="Run State:" FontWeight="Bold" Margin="0,20,0,0" />
-                <TextBlock Text="{x:Bind Service.PumpStatus.Running, Mode=OneWay}" />
-                <TextBlock Text="Status:" FontWeight="Bold" Margin="0,20,0,0" />
-                <TextBlock Text="{x:Bind Service.PumpStatus.State, Mode=OneWay}" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Background="LightGray">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock x:Name="ClockText" VerticalAlignment="Center" FontWeight="Bold" Grid.Column="1" FontSize="18" Margin="8,0"/>
+            <StackPanel Orientation="Horizontal">
+                <AppBarButton Icon="Home" Click="Home_Click" Label="Status"  />
+                <AppBarButton Icon="Calendar" Label="Schedules" />
+                <AppBarButton Icon="Setting" Click="Settings_Click" Label="Settings" />
             </StackPanel>
+
+        </Grid>
+        <Frame Grid.Row="1" x:Name="NavFrame" />
+     
     </Grid>
-  </ScrollViewer>
 </Page>

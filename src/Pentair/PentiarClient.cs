@@ -3,6 +3,7 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Pipelines;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Pentair;
@@ -22,9 +23,17 @@ public class Client : IDisposable
     static byte[] preamble = new byte[] { 0xff, 0x00, 0xff, 0xA5, 0x00 };
     private readonly System.IO.Ports.SerialPort port;
     private readonly Pipe pipe;
+    System.Device.Gpio.GpioController? gpio;
+
     bool isDisposed;
     public Client(string serialPort)
     {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            gpio = new System.Device.Gpio.GpioController();
+            gpio.OpenPin(18, System.Device.Gpio.PinMode.Output);
+            gpio.Write(18, System.Device.Gpio.PinValue.Low);
+        }
         port = new System.IO.Ports.SerialPort(serialPort);
         pipe = new Pipe();
         port.BaudRate = 9600;
@@ -134,13 +143,13 @@ public class Client : IDisposable
         }
     }
 
-    public void Stop(byte pumpId)
+    public Task Stop(byte pumpId)
     {
-        SendCommand(pumpId, StopCommand);
+        return SendCommandAsync(pumpId, StopCommand);
     }
-    public void Start(byte pumpId)
+    public Task Start(byte pumpId)
     {
-        SendCommand(pumpId, StartCommand);
+        return SendCommandAsync(pumpId, StartCommand);
     }
 
     public event EventHandler<Message>? MessageReceived;
@@ -170,23 +179,30 @@ public class Client : IDisposable
         msg = default;
         return false;
     }
-
-    public void SendCommand(byte destination, byte[] msg)
+    object sendLock = new object();
+    public async Task SendCommandAsync(byte destination, byte[] msg)
     {
-        port.Write(preamble, 0, preamble.Length);
-        port.Write(new byte[] { destination }, 0, 1);
-        port.Write(msg, 0, msg.Length);
-        ushort checksum = 0;
-        checksum += 0xa5;
-        checksum += destination;
-        for (int i = 0; i < msg.Length; i++)
+        //lock (sendLock)
         {
-            checksum += msg[i];
+            gpio?.Write(18, System.Device.Gpio.PinValue.High);
+            await Task.Delay(10).ConfigureAwait(false);
+            port.Write(preamble, 0, preamble.Length);
+            port.Write(new byte[] { destination }, 0, 1);
+            port.Write(msg, 0, msg.Length);
+            ushort checksum = 0;
+            checksum += 0xa5;
+            checksum += destination;
+            for (int i = 0; i < msg.Length; i++)
+            {
+                checksum += msg[i];
+            }
+            byte[] checksumbuf = new byte[2];
+            BitConverter.GetBytes(checksum).CopyTo(checksumbuf, 0);
+            port.Write(checksumbuf, 1, 1);
+            port.Write(checksumbuf, 0, 1);
+            await Task.Delay(10).ConfigureAwait(false);
+            gpio?.Write(18, System.Device.Gpio.PinValue.Low);
         }
-        byte[] checksumbuf = new byte[2];
-        BitConverter.GetBytes(checksum).CopyTo(checksumbuf, 0);
-        port.Write(checksumbuf, 1, 1);
-        port.Write(checksumbuf, 0, 1);
     }
 
     public async Task<StatusMessage> GetStatusAsync(byte pump, CancellationToken cancellationToken = default)
@@ -206,7 +222,7 @@ public class Client : IDisposable
             tcs.TrySetCanceled();
         }))
         
-        SendCommand(pump, RequestStatus);
+        await SendCommandAsync(pump, RequestStatus);
         var timeoutTask = Task.Delay(2000, cancellationToken).ContinueWith(t => tcs.TrySetException(new TimeoutException("Timeout waiting for status message")));
         try
         {

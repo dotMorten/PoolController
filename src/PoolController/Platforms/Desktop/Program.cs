@@ -1,4 +1,5 @@
 using Uno.UI.Hosting;
+using Uno.UI.Runtime.Skia.Linux.FrameBuffer;
 
 namespace PoolController;
 
@@ -17,6 +18,10 @@ internal class Program
             .UseWin32()
             .Build();
 
+        if (host is FrameBufferHost fbh)
+        {
+            fbh.DisplayScale = 2;
+        }
         host.Run();
     }
 }

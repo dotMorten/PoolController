@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
@@ -56,10 +57,13 @@ public class PoolService : ObservableObject
         {
             return;
         }
-        PentairClient = new Pentair.Client(Settings.Instance.PumpComPort);
-        PentairClient.MessageReceived += PentairClient_MessageReceived;
-        pentairCts = new CancellationTokenSource();
-        PentairClientLoop(pentairCts.Token);
+        if (!string.IsNullOrEmpty(Settings.Instance.PumpComPort))
+        {
+            PentairClient = new Pentair.Client(Settings.Instance.PumpComPort);
+            PentairClient.MessageReceived += PentairClient_MessageReceived;
+            pentairCts = new CancellationTokenSource();
+            PentairClientLoop(pentairCts.Token);
+        }
     }
 
     private CancellationTokenSource? pentairCts;
@@ -74,7 +78,7 @@ public class PoolService : ObservableObject
         {
             try
             {
-                PentairClient.SendCommand(0x60, Client.RequestStatus);
+                await PentairClient.SendCommandAsync(0x60, Client.RequestStatus);
             }
             catch
             {
@@ -168,9 +172,15 @@ public class Settings : ObservableObject
         OnPropertyChanged(key);
     }
 
+    private static string GetDefaultPort()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            return "/dev/serial0";
+        return string.Empty;
+    }
     public string? PumpComPort
     {
-        get => GetSetting(string.Empty);
+        get => GetSetting(GetDefaultPort());
         set => SetSetting(value ?? string.Empty);
     }
 

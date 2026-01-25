@@ -1,0 +1,31 @@
+﻿<Page
+    x:Class="PoolController.StatusView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PoolController"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <ScrollViewer IsTabStop="True" Grid.Row="1">
+        <Grid >
+            <StackPanel
+      HorizontalAlignment="Center"
+      VerticalAlignment="Center">
+                <TextBlock Text="Pump Power (W):" FontWeight="Bold" Margin="0,20,0,0" />
+                <TextBlock Text="{x:Bind Service.PumpStatus.Power, Mode=OneWay}" />
+                <TextBlock Text="Pump Speed (RPM):" FontWeight="Bold" Margin="0,20,0,0" />
+                <TextBlock Text="{x:Bind Service.PumpStatus.PumpSpeed, Mode=OneWay}" />
+                <TextBlock Text="Flow (GPM):" FontWeight="Bold" Margin="0,20,0,0" />
+                <TextBlock Text="{x:Bind Service.PumpStatus.EstimatedFlow, Mode=OneWay}" />
+                <TextBlock Text="Pump Clock:" FontWeight="Bold" Margin="0,20,0,0" />
+                <TextBlock Text="{x:Bind Service.PumpStatus.Clock, Mode=OneWay}" />
+                <TextBlock Text="Run State:" FontWeight="Bold" Margin="0,20,0,0" />
+                <TextBlock Text="{x:Bind Service.PumpStatus.Running, Mode=OneWay}" />
+                <TextBlock Text="Status:" FontWeight="Bold" Margin="0,20,0,0" />
+                <TextBlock Text="{x:Bind Service.PumpStatus.State, Mode=OneWay}" />
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>
