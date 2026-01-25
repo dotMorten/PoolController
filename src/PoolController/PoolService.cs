@@ -80,7 +80,7 @@ public class PoolService : ObservableObject
             {
                 // Ignore errors for now
             }
-            await Task.Delay(1000);
+            await Task.Delay(10000);
         }
     }
 
