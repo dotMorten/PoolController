@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Extensions.Logging;
 using Uno.Resizetizer;
+using UnoKeyboard;
 
 namespace PoolController;
 
@@ -31,27 +32,29 @@ public partial class App : Application
         if (MainWindow.Content is not Frame rootFrame)
         {
             // Create a Frame to act as the navigation context and navigate to the first page
-            rootFrame = new Frame();
+            //rootFrame = new Frame();
 
-            // Place the frame in the current Window
-            MainWindow.Content = rootFrame;
+            //// Place the frame in the current Window
+            //MainWindow.Content = rootFrame;
 
-            rootFrame.NavigationFailed += OnNavigationFailed;
+            //rootFrame.NavigationFailed += OnNavigationFailed;
         }
 
-        if (rootFrame.Content == null)
+        MainWindow.AddKeyboard(height: 300);
+        RootFrame.NavigationFailed += OnNavigationFailed;
+        if (RootFrame.Content == null)
         {
             // When the navigation stack isn't restored navigate to the first page,
             // configuring the new page by passing required information as a navigation
             // parameter
-            rootFrame.Navigate(typeof(MainPage), args.Arguments);
+            RootFrame.Navigate(typeof(MainPage), args.Arguments);
         }
 
         MainWindow.SetWindowIcon();
         // Ensure the current window is active
         MainWindow.Activate();
     }
-
+    public static Frame RootFrame => McWindowEx.RootFrame;
     /// <summary>
     /// Invoked when Navigation to a certain page fails
     /// </summary>
