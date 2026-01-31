@@ -6,7 +6,6 @@
       xmlns:utu="using:Uno.Toolkit.UI"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
   <ScrollViewer IsTabStop="True">
-    <Grid utu:SafeArea.Insets="VisibleBounds">
       <StackPanel
         HorizontalAlignment="Center"
         VerticalAlignment="Center" Orientation="Horizontal">
@@ -27,6 +26,5 @@
                     </StackPanel>
                 </controls:SettingsCard>
             </StackPanel>
-    </Grid>
   </ScrollViewer>
 </Page>

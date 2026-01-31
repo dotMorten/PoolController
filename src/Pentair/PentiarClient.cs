@@ -28,6 +28,7 @@ public class Client : IDisposable
     bool isDisposed;
     public Client(string serialPort)
     {
+        Log("Opening RS485 Port on  + serialPort");
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             gpio = new System.Device.Gpio.GpioController();
@@ -39,6 +40,7 @@ public class Client : IDisposable
         port.BaudRate = 9600;
         port.DataReceived += OnSerialPortDataReceived;
         port.Open();
+        Log("Opened RS485 Port");
         _ = ReadPipeAsync(pipe.Reader);
     }
 
@@ -140,7 +142,18 @@ public class Client : IDisposable
                 };
             }
             MessageReceived?.Invoke(null, message);
+            Log(message);
         }
+    }
+
+    private static void Log(object message)
+    {
+#if DEBUG
+        if (Debugger.IsAttached)
+            Debug.WriteLine(message.ToString());
+        else if (!Console.IsInputRedirected)
+            Console.WriteLine(message.ToString());
+#endif
     }
 
     public Task Stop(byte pumpId)
@@ -163,17 +176,30 @@ public class Client : IDisposable
         // followed by the data and 2 byte checksum.
         // This method will find an entire message and add it to 'msg' and advance the buffer
         var reader = new SequenceReader<byte>(buffer);
-        if (reader.AdvancePastAny(new byte[] { 0xff, 0x00, 0xff }) > 0)
-        {
-            var start = reader.Position;
-            if (reader.TryReadExact(5, out _) &&
-                reader.TryRead(out byte len) &&
-                reader.TryReadExact(len + 2, out _))
+        // Look for the exact sequence 0xff, 0x00, 0xff
+        while(reader.Remaining > 3) {
+            if (reader.TryAdvanceTo(0xff, advancePastDelimiter: true))
             {
-                msg = buffer.Slice(start, reader.Position);
-                buffer = buffer.Slice(buffer.GetPosition(0, reader.Position));
+                var tempReader = reader;
+                if (tempReader.TryRead(out byte b1) && b1 == 0x00 &&
+                    tempReader.TryRead(out byte b2) && b2 == 0xff)
+                {
+                // Advance the main reader past the sequence
+                reader.Advance(2);
+                var start = reader.Position;
+                if (reader.TryReadExact(5, out _) &&
+                    reader.TryRead(out byte len) &&
+                    reader.TryReadExact(len + 2, out _))
+                {
+                    msg = buffer.Slice(start, reader.Position);
+                    buffer = buffer.Slice(buffer.GetPosition(0, reader.Position));
 
-                return true;
+                    return true;
+                }
+                }
+            }
+            else {
+                break;
             }
         }
         msg = default;

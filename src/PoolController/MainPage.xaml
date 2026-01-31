@@ -4,7 +4,7 @@
       xmlns:local="using:PoolController"
       xmlns:utu="using:Uno.Toolkit.UI"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    <Grid utu:SafeArea.Insets="VisibleBounds">
+    <Grid utu:SafeArea.Insets="VisibleBounds" x:Name="LayoutRoot">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -14,14 +14,18 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock x:Name="ClockText" VerticalAlignment="Center" FontWeight="Bold" Grid.Column="1" FontSize="18" Margin="8,0"/>
             <StackPanel Orientation="Horizontal">
                 <AppBarButton Icon="Home" Click="Home_Click" Label="Status"  />
                 <AppBarButton Icon="Calendar" Label="Schedules" />
-                <AppBarButton Icon="Setting" Click="Settings_Click" Label="Settings" />
+                <AppBarButton Icon="Help" Label="About" />
             </StackPanel>
+
+            <AppBarButton Icon="Setting" Click="Settings_Click" Label="Settings" Grid.Column="1" />
+
+            <TextBlock x:Name="ClockText" VerticalAlignment="Center" FontWeight="Bold" Grid.Column="2" FontSize="18" Margin="8,0"/>
 
         </Grid>
         <Frame Grid.Row="1" x:Name="NavFrame" />

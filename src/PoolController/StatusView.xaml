@@ -8,8 +8,7 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <ScrollViewer IsTabStop="True" Grid.Row="1">
-        <Grid >
+    <ScrollViewer IsTabStop="True">
             <StackPanel
       HorizontalAlignment="Center"
       VerticalAlignment="Center">
@@ -26,6 +25,5 @@
                 <TextBlock Text="Status:" FontWeight="Bold" Margin="0,20,0,0" />
                 <TextBlock Text="{x:Bind Service.PumpStatus.State, Mode=OneWay}" />
             </StackPanel>
-        </Grid>
     </ScrollViewer>
 </Page>

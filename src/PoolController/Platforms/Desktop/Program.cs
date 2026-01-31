@@ -13,7 +13,7 @@ internal class Program
         var host = UnoPlatformHostBuilder.Create()
             .App(() => new App())
             .UseX11()
-            .UseLinuxFrameBuffer()
+            .UseLinuxFrameBuffer(hostBuilder => hostBuilder.Orientation(Windows.Graphics.Display.DisplayOrientations.Portrait).DisableKMSDRM())
             .UseMacOS()
             .UseWin32()
             .Build();
@@ -21,6 +21,7 @@ internal class Program
         if (host is FrameBufferHost fbh)
         {
             fbh.DisplayScale = 2;
+            MainPage.TurnOnScreen();
         }
         host.Run();
     }
