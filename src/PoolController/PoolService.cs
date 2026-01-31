@@ -119,8 +119,10 @@ public partial class PoolService : ObservableObject
     {
         if(value)
             _ = PentairClient?.SendCommandAsync(0x60, Client.PanelControlOn);
-        else
+        else {
+            _ = PentairClient?.SendCommandAsync(0x60, Client.PanelControlOff);
             _ = PentairClient?.SendCommandAsync(0x60, Client.RequestStatus);
+        }
     }
 
     public Models.PoolPumpModel PumpStatus { get; } = new Models.PoolPumpModel();

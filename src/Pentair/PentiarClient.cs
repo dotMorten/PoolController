@@ -229,6 +229,7 @@ public class Client : IDisposable
             await Task.Delay(10).ConfigureAwait(false);
             gpio?.Write(18, System.Device.Gpio.PinValue.Low);
         }
+        await Task.Delay(50); // Wait a little to ensure we don't see another message right away
     }
 
     public async Task<StatusMessage> GetStatusAsync(byte pump, CancellationToken cancellationToken = default)
