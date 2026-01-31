@@ -1,0 +1,108 @@
+﻿<UserControl
+    x:Class="PoolController.Controls.PumpStatus"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PoolController.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="320"
+    d:DesignWidth="400">
+
+
+
+    <Border
+        Padding="20"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        CornerRadius="16"
+        Background="White"
+        BorderBrush="#2A2F36"
+        BorderThickness="1">
+
+        <Grid RowSpacing="14">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Grid Grid.Row="0" ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Spacing="2">
+                    <TextBlock Text="Pool Pump" FontSize="16" FontWeight="SemiBold"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <Ellipse Width="8" Height="8" Fill="{Binding StatusBrush}"/>
+                        <TextBlock Text="{Binding StatusText}" Opacity="0.75"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Optional: a subtle “pill” button for details/settings -->
+                <!--<Button Grid.Column="1" Content="⋯" Width="40" Height="32"
+                        CornerRadius="10" Background="#262B33" BorderThickness="0"/>-->
+            </Grid>
+
+            <!-- RPM hero + semi ring gauge -->
+            <Grid Grid.Row="0" Grid.RowSpan="2" >
+
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <!-- Semi-ring gauge (see section 2 for how it works) -->
+                <Grid Width="190" Height="100">
+                    <local:SemiRingGauge
+                                Value="{x:Bind Service.PumpStatus.PumpSpeed, Mode=OneWay}"
+                                StrokeThickness="10"
+                                TrackBrush="#2B313A"
+                                ValueBrush="#4CC2FF"/>
+                    <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                        <TextBlock Text="RPM" Opacity="0.75" FontSize="13" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{x:Bind Service.PumpStatus.PumpSpeed, Mode=OneWay}" FontSize="38" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Grid.Row="1" Text="{x:Bind Service.PumpStatus.Running, Mode=OneWay}" HorizontalAlignment="Center" Opacity="0.65" FontSize="12"/>
+            </Grid>
+
+            <!-- Watts secondary -->
+            <Grid Grid.Row="2" RowSpacing="6">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Power Usage" Opacity="0.75"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind Service.PumpStatus.Power, Mode=OneWay}" Opacity="0.85"/>
+                </Grid>
+
+                <ProgressBar
+                    Grid.Row="1"
+                    Height="8"
+                    CornerRadius="4"
+                    Minimum="0"
+                    Maximum="2500"
+                    Value="{x:Bind Service.PumpStatus.Power, Mode=OneWay}" 
+                            Background="#2B313A"
+                    Foreground="#F2B705"/>
+            </Grid>
+
+            <TextBlock Grid.Row="3"
+                       Text="{x:Bind Service.PumpStatus.State, Mode=OneWay}"
+                       Opacity="0.6"
+                       FontSize="12"/>
+        </Grid>
+    </Border>
+</UserControl>
