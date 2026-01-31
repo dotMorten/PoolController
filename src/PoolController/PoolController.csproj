@@ -1,21 +1,20 @@
 ﻿<Project Sdk="Uno.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0-desktop</TargetFramework>
-    <RuntimeIdentifier>linux-arm64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="$([MSBuild]::IsOSPlatform('Linux'))">linux-arm64</RuntimeIdentifier>
     <OutputType>Exe</OutputType>
     <UnoSingleProject>true</UnoSingleProject>
-
     <!-- Display name -->
     <ApplicationTitle>PoolController</ApplicationTitle>
     <!-- App Identifier -->
-    <ApplicationId>com.companyname.PoolController</ApplicationId>
+    <ApplicationId>com.dotMorten.PoolController</ApplicationId>
     <!-- Versions -->
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
     <!-- Package Publisher -->
     <ApplicationPublisher>mn</ApplicationPublisher>
     <!-- Package Description -->
-    <Description>PoolController powered by Uno Platform.</Description>
+    <Description>PoolController</Description>
 
     <!--
       UnoFeatures are used to quickly add and manage features enabled for your app.
