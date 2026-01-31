@@ -26,4 +26,9 @@ public sealed partial class PumpStatus : UserControl
 
     public PoolService Service => PoolService.Instance;
 
+    private void serviceModeButton_Click(object sender, RoutedEventArgs e)
+    {
+        Service.IsPumpInServiceMode = !Service.IsPumpInServiceMode;
+        serviceModeButton.Content = Service.IsPumpInServiceMode ? "Disable Service Mode" : "Enable Service Mode";
+    }
 }

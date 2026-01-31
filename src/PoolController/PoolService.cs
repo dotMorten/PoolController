@@ -10,7 +10,7 @@ using Pentair;
 
 namespace PoolController;
 
-public class PoolService : ObservableObject
+public partial class PoolService : ObservableObject
 {
     private PoolService()
     {
@@ -79,12 +79,14 @@ public class PoolService : ObservableObject
             try
             {
                 await PentairClient.SendCommandAsync(0x60, Client.RequestStatus);
+                if (IsPumpInServiceMode) // turn panel control back on after getting status
+                    await PentairClient.SendCommandAsync(0x60, Client.PanelControlOn);
             }
             catch
             {
                 // Ignore errors for now
             }
-            await Task.Delay(10000);
+            await Task.Delay(IsPumpInServiceMode ? 60000 : 10000);
         }
     }
 
@@ -108,6 +110,17 @@ public class PoolService : ObservableObject
                });
             }
         }
+    }
+
+    [ObservableProperty]
+    private bool _isPumpInServiceMode;
+
+    partial void OnIsPumpInServiceModeChanged(bool value)
+    {
+        if(value)
+            _ = PentairClient?.SendCommandAsync(0x60, Client.PanelControlOn);
+        else
+            _ = PentairClient?.SendCommandAsync(0x60, Client.RequestStatus);
     }
 
     public Models.PoolPumpModel PumpStatus { get; } = new Models.PoolPumpModel();

@@ -27,5 +27,4 @@ public partial class PoolPumpModel : ObservableObject
     {  
         IsOn = on; 
     }
-
 }

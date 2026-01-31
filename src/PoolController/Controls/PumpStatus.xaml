@@ -36,11 +36,11 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Spacing="2">
-                    <TextBlock Text="Pool Pump" FontSize="16" FontWeight="SemiBold"/>
-                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                        <Ellipse Width="8" Height="8" Fill="{Binding StatusBrush}"/>
-                        <TextBlock Text="{Binding StatusText}" Opacity="0.75"/>
-                    </StackPanel>
+                    <TextBlock Text="Pump" FontSize="16" FontWeight="SemiBold"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Top" HorizontalAlignment="Right">
+                    <TextBlock Text="{x:Bind Service.PumpStatus.State, Mode=OneWay}" Opacity="0.75"/>
+                    <Ellipse Width="8" Height="8" Fill="Green"/>
                 </StackPanel>
 
                 <!-- Optional: a subtle “pill” button for details/settings -->
@@ -49,7 +49,7 @@
             </Grid>
 
             <!-- RPM hero + semi ring gauge -->
-            <Grid Grid.Row="0" Grid.RowSpan="2" >
+            <Grid Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Center">
 
                 <Grid.RowDefinitions>
                     <RowDefinition />
@@ -99,10 +99,15 @@
                     Foreground="#F2B705"/>
             </Grid>
 
-            <TextBlock Grid.Row="3"
+            <!--<TextBlock Grid.Row="3"
                        Text="{x:Bind Service.PumpStatus.State, Mode=OneWay}"
                        Opacity="0.6"
-                       FontSize="12"/>
+                       FontSize="12" VerticalAlignment="Center"/>-->
+
+            <ToggleButton Grid.Row="3" Content="Enable Service Mode" x:Name="serviceModeButton"
+                       Click="serviceModeButton_Click" ClickMode="Press" HorizontalAlignment="Stretch"
+                              />
+
         </Grid>
     </Border>
 </UserControl>

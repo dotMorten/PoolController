@@ -10,13 +10,53 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <ScrollViewer IsTabStop="True">
-            <StackPanel
-      HorizontalAlignment="Center"
-      VerticalAlignment="Center">
+            <Grid Margin="20,0"
+      VerticalAlignment="Center" ColumnSpacing="20">
 
-            <ctrls:PumpStatus Width="320" HorizontalAlignment="Left" />
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320 "/>
+                <ColumnDefinition  Width="*" />
+            </Grid.ColumnDefinitions>
+            <ctrls:PumpStatus />
 
 
+            <StackPanel Grid.Column="1">
+            <Border Grid.Column="1"
+        Padding="20" 
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        CornerRadius="16"
+        Background="White"
+        BorderBrush="#2A2F36"
+        BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Temperature" FontSize="16" FontWeight="SemiBold"/>
+
+                    <TextBlock  Grid.Row="1" Text="Pool" />
+                    <TextBlock  Grid.Row="1" Text="58.4 °F" Grid.Column="1" HorizontalAlignment="Right" FontWeight="Bold" />
+                    <TextBlock  Grid.Row="2" Text="Return"  />
+                    <TextBlock  Grid.Row="2" Text="64.2 °F" Grid.Column="1" HorizontalAlignment="Right" FontWeight="Bold" />
+                    <TextBlock  Grid.Row="3" Text="Air" />
+                    <TextBlock  Grid.Row="3" Text="68.8 °F" Grid.Column="1" HorizontalAlignment="Right" FontWeight="Bold" />
+                    <TextBlock  Grid.Row="4" Text="Gas Heater" />
+                    <TextBlock  Grid.Row="4" Text="Disabled" Grid.Column="1" HorizontalAlignment="Right" FontWeight="Bold" />
+                    <TextBlock  Grid.Row="5" Text="Solar Heater" />
+                    <TextBlock  Grid.Row="5" Text="Enabled" Grid.Column="1" HorizontalAlignment="Right" FontWeight="Bold" />
+                </Grid>
+            </Border>
+            </StackPanel>
             <!--<TextBlock Text="Pump Power (W):" FontWeight="Bold" Margin="0,20,0,0" />
                 <TextBlock Text="{x:Bind Service.PumpStatus.Power, Mode=OneWay}" />
                 <TextBlock Text="Pump Speed (RPM):" FontWeight="Bold" Margin="0,20,0,0" />
@@ -29,6 +69,6 @@
                 <TextBlock Text="{x:Bind Service.PumpStatus.Running, Mode=OneWay}" />
                 <TextBlock Text="Status:" FontWeight="Bold" Margin="0,20,0,0" />
                 <TextBlock Text="{x:Bind Service.PumpStatus.State, Mode=OneWay}" />-->
-            </StackPanel>
+            </Grid>
     </ScrollViewer>
 </Page>
