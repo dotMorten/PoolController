@@ -54,16 +54,16 @@
                     </Grid>
 
                     <!-- RPM hero + semi ring gauge -->
-                    <Grid Grid.Row="1" >
+                    <Grid Grid.Row="0" Grid.RowSpan="2" >
 
                         <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition />
                         </Grid.RowDefinitions>
                         <!-- Semi-ring gauge (see section 2 for how it works) -->
-                        <Grid Width="190" Height="120">
+                        <Grid Width="190" Height="100">
                             <ctrls:SemiRingGauge
-                                Value="1750"
+                                Value="{x:Bind Service.PumpStatus.PumpSpeed, Mode=OneWay}"
                                 StrokeThickness="10"
                                 TrackBrush="#2B313A"
                                 ValueBrush="#4CC2FF"/>
