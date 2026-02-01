@@ -16,8 +16,8 @@ public class Client : IDisposable
     public readonly static byte[] PanelControlOn = new byte[] { SourceAddress, 0x04, 0x01, 0x00 };
     public readonly static byte[] RequestStatus = new byte[] { SourceAddress, 0x07, 0x00 };
     public readonly static byte[] StartProgram2 = new byte[] { SourceAddress, 0x01, 0x04, 0x03, 0x21, 0x00, 0x20 };
-    public readonly static byte[] StopCommand = new byte[] { SourceAddress, 0x06, 0x01, 0x0A };
-    public readonly static byte[] StartCommand = new byte[] { SourceAddress, 0x06, 0x01, 0x04 };
+    public readonly static byte[] StopCommand = new byte[] { SourceAddress, 0x06, 0x01, 0x04 };
+    public readonly static byte[] StartCommand = new byte[] { SourceAddress, 0x06, 0x01, 0x0A };
 
 
     static byte[] preamble = new byte[] { 0xff, 0x00, 0xff, 0xA5, 0x00 };

@@ -15,9 +15,9 @@
             <ToggleButton Content="Enable Service Mode" x:Name="serviceModeButton"
                        Click="serviceModeButton_Click" ClickMode="Press" HorizontalAlignment="Stretch" />
 
-            <Button Content="Stop" x:Name="stopButton"
+            <Button Content="Start" x:Name="stopButton"
                        Click="stopButton_Click" ClickMode="Press" HorizontalAlignment="Stretch" />
-
+        
             <Button Content="Run Program 1" x:Name="program1Button"
                        Click="program1Button_Click" ClickMode="Press" HorizontalAlignment="Stretch" />
         </StackPanel>
