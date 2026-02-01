@@ -109,6 +109,11 @@ public partial class PoolService : ObservableObject
                    PumpStatus.Running = statusMessage.Run;
                    PumpStatus.Mode = statusMessage.Mode;
                    PumpStatus.Timer = statusMessage.Timer;
+                   if(PumpStatus.Clock.Hour != DateTime.Now.Hour || Math.Abs(PumpStatus.Clock.Minute - DateTime.Now.Minute - DateTime.Now.Second / 60d) > 1.5)
+                   {
+                       // Clock is off, update it
+                       _ = PentairClient?.SetPumpClock(Pentair.Client.Pump1, (byte)DateTime.Now.Hour, (byte)DateTime.Now.Minute);
+                   }
                });
             }
         }

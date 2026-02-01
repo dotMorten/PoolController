@@ -16,8 +16,8 @@ public class Client : IDisposable
     public readonly static byte[] PanelControlOn = new byte[] { SourceAddress, 0x04, 0x01, 0x00 };
     public readonly static byte[] RequestStatus = new byte[] { SourceAddress, 0x07, 0x00 };
     public readonly static byte[] StartProgram2 = new byte[] { SourceAddress, 0x01, 0x04, 0x03, 0x21, 0x00, 0x20 };
-    public readonly static byte[] StopCommand = new byte[] { SourceAddress, 0x01, 0x06, 0x01, 0x0A };
-    public readonly static byte[] StartCommand = new byte[] { SourceAddress, 0x01, 0x06, 0x01, 0x04 };
+    public readonly static byte[] StopCommand = new byte[] { SourceAddress, 0x06, 0x01, 0x0A };
+    public readonly static byte[] StartCommand = new byte[] { SourceAddress, 0x06, 0x01, 0x04 };
 
 
     static byte[] preamble = new byte[] { 0xff, 0x00, 0xff, 0xA5, 0x00 };
@@ -164,6 +164,34 @@ public class Client : IDisposable
     {
         return SendCommandAsync(pumpId, StartCommand);
     }
+
+    public Task StartLocalProgram(byte pumpId, byte program)
+    {
+        var cmd = new byte[] { SourceAddress, 0x05, 0x01,  program };
+        return SendCommandAsync(pumpId, cmd);
+    }   
+
+    public Task StartExternalProgram(byte pumpId, byte program)
+    {
+        var cmd = new byte[] { SourceAddress, 0x01, 0x04, 0x03, 0x21, 0x00, (byte)(program * 8) };
+        return SendCommandAsync(pumpId, cmd);
+    }   
+
+/// <summary>
+/// // This command is not supported on all IntelliFlo models
+/// Some models return error 0xFF 0x19 indicating the command is rejected
+/// The clock may be read-only and must be set via the pump's physical interface
+/// </summary>
+/// <param name="pumpId"></param>
+/// <param name="hour"></param>
+/// <param name="minute"></param>
+/// <returns></returns>
+    public Task SetPumpClock(byte pumpId, byte hour, byte minute)
+    {
+        var cmd = new byte[] { SourceAddress, 0x03, 0x02, hour, minute };
+        return SendCommandAsync(pumpId, cmd);
+    }
+
 
     public event EventHandler<Message>? MessageReceived;
 
