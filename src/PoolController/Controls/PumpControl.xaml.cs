@@ -13,8 +13,6 @@ using Microsoft.UI.Xaml.Navigation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
-// The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
-
 namespace PoolController.Controls;
 
 public sealed partial class PumpControl : UserControl
@@ -24,7 +22,7 @@ public sealed partial class PumpControl : UserControl
         this.InitializeComponent();
         serviceModeButton.IsChecked = Service.IsPumpInServiceMode;
         serviceModeButton.Content = Service.IsPumpInServiceMode ? "Disable Service Mode" : "Enable Service Mode";
-        stopButton.Content = Service.PumpStatus.Running == Pentair.PumpRunning.Stopped ? "Start" : "Stop";
+        UpdateStopButton();
         program1Button.IsEnabled = stopButton.IsEnabled = !Service.IsPumpInServiceMode;
     }
 
@@ -37,18 +35,26 @@ public sealed partial class PumpControl : UserControl
         program1Button.IsEnabled = stopButton.IsEnabled = !Service.IsPumpInServiceMode;
     }
 
-    private void stopButton_Click(object sender, RoutedEventArgs e)
+    private async void stopButton_Click(object sender, RoutedEventArgs e)
     {
-        if(Service.PumpStatus.Running == Pentair.PumpRunning.Stopped)
+        if (Service.PentairClient is null)
+            return;
+        if (Service.PumpStatus.Running == Pentair.PumpRunning.Stopped)
         {
-            Service.PentairClient?.Start(Pentair.Client.Pump1);
-            stopButton.Content = "Stop";
+            await Service.PentairClient.Start(Pentair.Client.Pump1);
+            await Service.PentairClient.GetStatusAsync(Pentair.Client.Pump1);
         }
         else
         {
-            Service.PentairClient?.Stop(Pentair.Client.Pump1);
-            stopButton.Content = "Start";
+            await Service.PentairClient.Stop(Pentair.Client.Pump1);
+            await Service.PentairClient.GetStatusAsync(Pentair.Client.Pump1);
         }
+        UpdateStopButton();
+    }
+
+    private void UpdateStopButton()
+    {
+        stopButton.Content = Service.PumpStatus.Running == Pentair.PumpRunning.Stopped ? "Start" : "Stop";
     }
 
     private void program1Button_Click(object sender, RoutedEventArgs e)
