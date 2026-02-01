@@ -59,13 +59,18 @@ public enum PumpRunning : byte
 public enum PumpMode : byte
 {
     Filter = 0x00,
-    Manual = 0x01,
-    Backwash = 0x02,
-    Feature1 = 0x06,
-    ExternalProgram1 = 0x09,
-    ExternalProgram2 = 0x0a,
-    ExternalProgram3 = 0x0b,
-    ExternalProgram4 = 0x0c,
+    Local1 = 0x01,
+    Local2 = 0x02,
+    Local3 = 0x03,
+    Local4 = 0x04,
+    External1 = 0x09,
+    External2 = 0x0A,
+    External3 = 0x0B,
+    External4 = 0x0C,
+    Timeout = 0x0E,
+    Priming = 0x11,
+    QuickClean = 0x0D,
+    Unknown = 0xFF,
 }
 public enum PumpState : byte
 {

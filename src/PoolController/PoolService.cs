@@ -107,6 +107,7 @@ public partial class PoolService : ObservableObject
                    PumpStatus.Clock = statusMessage.Clock;
                    PumpStatus.State = statusMessage.State;
                    PumpStatus.Running = statusMessage.Run;
+                   PumpStatus.Mode = statusMessage.Mode;
                });
             }
         }
