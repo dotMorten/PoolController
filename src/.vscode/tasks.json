@@ -26,6 +26,28 @@
         "/consoleloggerparameters:NoSummary"
       ],
       "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Disable pool system service",
+      "command": "sudo",
+      "type": "process",
+      "args": [
+        "systemctl",
+        "disable",
+        "poolcontroller.service"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Enable pool system service",
+      "command": "sudo",
+      "type": "process",
+      "args": [
+        "systemctl",
+        "enable",
+        "poolcontroller.service"
+      ],
+      "problemMatcher": []
     }
   ]
 }

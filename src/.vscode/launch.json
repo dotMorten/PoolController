@@ -13,7 +13,7 @@
       "request": "launch",
       "preLaunchTask": "build-desktop",
       // If you have changed target frameworks, make sure to update the program path.
-      "program": "${workspaceFolder}/PoolController/bin/Debug/net10.0-desktop/PoolController.dll",
+      "program": "${workspaceFolder}/PoolController/bin/Debug/net10.0-desktop/linux-arm64/PoolController.dll",
       "args": [],
       "launchSettingsProfile": "PoolController (Desktop)",
       "env": {
