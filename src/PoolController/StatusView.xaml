@@ -17,11 +17,13 @@
                 <ColumnDefinition Width="320 "/>
                 <ColumnDefinition  Width="*" />
             </Grid.ColumnDefinitions>
-            <ctrls:PumpStatus />
+            <ctrls:PumpStatus VerticalAlignment="Top" />
 
 
             <StackPanel Grid.Column="1">
-            <Border Grid.Column="1"
+
+                <ctrls:ChlorinatorStatus />
+                <Border Grid.Column="1" Visibility="Collapsed"
         Padding="20" 
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"

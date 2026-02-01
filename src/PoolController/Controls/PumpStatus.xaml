@@ -29,7 +29,7 @@
             </Grid.RowDefinitions>
 
             <!-- Header -->
-            <Grid Grid.Row="0" ColumnSpacing="12">
+            <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition Width="Auto"/>
@@ -85,7 +85,7 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Text="Power Usage" Opacity="0.75"/>
-                    <TextBlock Grid.Column="1" Text="{x:Bind Service.PumpStatus.Power, Mode=OneWay}" Opacity="0.85"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind Service.PumpStatus.Power.ToString('0W'), Mode=OneWay}" Opacity="0.85"/>
                 </Grid>
 
                 <ProgressBar

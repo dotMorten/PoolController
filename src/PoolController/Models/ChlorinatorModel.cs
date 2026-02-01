@@ -11,4 +11,7 @@ public partial class ChlorinatorModel : ObservableObject
 
     [ObservableProperty]
     private int _status = 0;
+
+    [ObservableProperty]
+    private double _temperature = double.NaN;
 }

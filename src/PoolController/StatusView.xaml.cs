@@ -25,6 +25,11 @@ public sealed partial class StatusView : Page
     public StatusView()
     {
         this.InitializeComponent();
+
+        // if (int.TryParse(File.ReadAllText("/sys/class/thermal/thermal_zone0/temp"), out int temp))
+        // {
+        //     Console.WriteLine($"CPU Temp: {temp / 1000}°C");
+        // }
     }
 
     public PoolService Service => PoolService.Instance;

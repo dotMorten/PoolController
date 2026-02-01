@@ -1,0 +1,84 @@
+﻿<UserControl
+    x:Class="PoolController.Controls.ChlorinatorStatus"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PoolController.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="320"
+    d:DesignWidth="400">
+
+    <Border
+        Padding="20"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        CornerRadius="16"
+        Background="White"
+        BorderBrush="#2A2F36"
+        BorderThickness="1">
+
+        <StackPanel Spacing="6">
+
+            <!-- Header -->
+            <Grid Grid.Row="0" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Spacing="2">
+                    <TextBlock Text="Chlorinator" FontSize="16" FontWeight="SemiBold"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Top" HorizontalAlignment="Right">
+                    <TextBlock Text="Salt OK" Opacity="0.75"/>
+                    <Ellipse Width="8" Height="8" Fill="Green"/>
+                </StackPanel>
+
+                <!-- Optional: a subtle “pill” button for details/settings -->
+                <!--<Button Grid.Column="1" Content="⋯" Width="40" Height="32"
+                        CornerRadius="10" Background="#262B33" BorderThickness="0"/>-->
+            </Grid>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Output" Opacity="0.75"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind Service.ChlorinatorStatus.Percentage.ToString('0\\%'), Mode=OneWay}" Opacity="0.85"/>
+                </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Salt Level" Opacity="0.75"/>
+                <TextBlock Grid.Column="1" Text="{x:Bind Service.ChlorinatorStatus.SaltLevel.ToString('0 ppm'), Mode=OneWay}" Opacity="0.85"/>
+            </Grid>
+
+            <Grid SizeChanged="Grid_SizeChanged" x:Name="SaltIndicatorGrid">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200*" />
+                        <ColumnDefinition Width="1700*" />
+                        <ColumnDefinition Width="200*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Background="Red" Height="20" Opacity=".5" />
+                    <Border Background="Green" Height="20" Grid.Column="1" Opacity=".5" />
+                <Border Background="Red" Height="20" Grid.Column="2" Opacity=".5" />
+                <Border Width="2" Background="Black" Margin="0,-2" Grid.ColumnSpan="3" HorizontalAlignment="Left" x:Name="SaltIndicatorLine" />
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Temperature" Opacity="0.75"/>
+                <TextBlock Grid.Column="1" Text="{x:Bind Service.ChlorinatorStatus.Temperature.ToString('0°F'), Mode=OneWay}" Opacity="0.85"/>
+            </Grid>
+
+
+        </StackPanel>
+    </Border>
+</UserControl>
