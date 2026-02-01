@@ -1,4 +1,4 @@
-namespace PoolController;
+namespace PoolController.Views;
 
 public sealed partial class SettingsPage : Page
 {
@@ -7,5 +7,5 @@ public sealed partial class SettingsPage : Page
         this.InitializeComponent();
     }
 
-    public Settings Settings => Settings.Instance;
+    public PoolController.Settings Settings => PoolController.Settings.Instance;
 }

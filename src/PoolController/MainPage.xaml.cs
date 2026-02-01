@@ -9,7 +9,7 @@ public sealed partial class MainPage : Page
     public MainPage()
     {
         this.InitializeComponent();
-        NavFrame.Navigate(typeof(StatusView));
+        NavFrame.Navigate(typeof(Views.StatusView));
         UpdateClock();
         screenOffTimer = new DispatcherTimer();
         screenOffTimer.Interval = TimeSpan.FromSeconds(60);
@@ -35,12 +35,13 @@ public sealed partial class MainPage : Page
 
     private void Settings_Click(object sender, RoutedEventArgs e)
     {
-        NavFrame.Navigate(typeof(SettingsPage));
+        NavFrame.Navigate(typeof(Views.SettingsPage));
     }
 
     private void Home_Click(object sender, RoutedEventArgs e)
     {
-        NavFrame.Navigate(typeof(StatusView));
+        NavFrame.Content = new Views.StatusView();
+        //NavFrame.Navigate(typeof(Views.StatusView));
     }
 
     private DispatcherTimer screenOffTimer;
