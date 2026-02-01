@@ -184,18 +184,18 @@ public class Client : IDisposable
                 if (tempReader.TryRead(out byte b1) && b1 == 0x00 &&
                     tempReader.TryRead(out byte b2) && b2 == 0xff)
                 {
-                // Advance the main reader past the sequence
-                reader.Advance(2);
-                var start = reader.Position;
-                if (reader.TryReadExact(5, out _) &&
-                    reader.TryRead(out byte len) &&
-                    reader.TryReadExact(len + 2, out _))
-                {
-                    msg = buffer.Slice(start, reader.Position);
-                    buffer = buffer.Slice(buffer.GetPosition(0, reader.Position));
+                    // Advance the main reader past the sequence
+                    reader.Advance(2);
+                    var start = reader.Position;
+                    if (reader.TryReadExact(5, out _) &&
+                        reader.TryRead(out byte len) &&
+                        reader.TryReadExact(len + 2, out _))
+                    {
+                        msg = buffer.Slice(start, reader.Position);
+                        buffer = buffer.Slice(buffer.GetPosition(0, reader.Position));
 
-                    return true;
-                }
+                        return true;
+                    }
                 }
             }
             else {
@@ -205,31 +205,40 @@ public class Client : IDisposable
         msg = default;
         return false;
     }
-    object sendLock = new object();
+
+    private readonly SemaphoreSlim portLock = new SemaphoreSlim(1, 1);
+
     public async Task SendCommandAsync(byte destination, byte[] msg)
     {
-        //lock (sendLock)
+        try
         {
-            gpio?.Write(18, System.Device.Gpio.PinValue.High);
-            await Task.Delay(10).ConfigureAwait(false);
-            port.Write(preamble, 0, preamble.Length);
-            port.Write(new byte[] { destination }, 0, 1);
-            port.Write(msg, 0, msg.Length);
-            ushort checksum = 0;
-            checksum += 0xa5;
-            checksum += destination;
-            for (int i = 0; i < msg.Length; i++)
+            await portLock.WaitAsync();
             {
-                checksum += msg[i];
+                gpio?.Write(18, System.Device.Gpio.PinValue.High);
+                await Task.Delay(10).ConfigureAwait(false);
+                port.Write(preamble, 0, preamble.Length);
+                port.Write(new byte[] { destination }, 0, 1);
+                port.Write(msg, 0, msg.Length);
+                ushort checksum = 0;
+                checksum += 0xa5;
+                checksum += destination;
+                for (int i = 0; i < msg.Length; i++)
+                {
+                    checksum += msg[i];
+                }
+                byte[] checksumbuf = new byte[2];
+                BitConverter.GetBytes(checksum).CopyTo(checksumbuf, 0);
+                port.Write(checksumbuf, 1, 1);
+                port.Write(checksumbuf, 0, 1);
+                await Task.Delay(10).ConfigureAwait(false);
+                gpio?.Write(18, System.Device.Gpio.PinValue.Low);
             }
-            byte[] checksumbuf = new byte[2];
-            BitConverter.GetBytes(checksum).CopyTo(checksumbuf, 0);
-            port.Write(checksumbuf, 1, 1);
-            port.Write(checksumbuf, 0, 1);
-            await Task.Delay(10).ConfigureAwait(false);
-            gpio?.Write(18, System.Device.Gpio.PinValue.Low);
+            await Task.Delay(50); // Wait a little to ensure we don't see another message right away
         }
-        await Task.Delay(50); // Wait a little to ensure we don't see another message right away
+        finally
+        {
+            portLock.Release();
+        }
     }
 
     public async Task<StatusMessage> GetStatusAsync(byte pump, CancellationToken cancellationToken = default)

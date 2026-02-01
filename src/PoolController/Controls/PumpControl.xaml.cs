@@ -41,11 +41,13 @@ public sealed partial class PumpControl : UserControl
             return;
         if (Service.PumpStatus.Running == Pentair.PumpRunning.Stopped)
         {
+            stopButton.Content = "Starting...";
             await Service.PentairClient.Start(Pentair.Client.Pump1);
             await Service.PentairClient.GetStatusAsync(Pentair.Client.Pump1);
         }
         else
         {
+            stopButton.Content = "Stopping...";
             await Service.PentairClient.Stop(Pentair.Client.Pump1);
             await Service.PentairClient.GetStatusAsync(Pentair.Client.Pump1);
         }
