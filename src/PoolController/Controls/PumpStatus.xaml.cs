@@ -29,6 +29,18 @@ public sealed partial class PumpStatus : UserControl
     private void serviceModeButton_Click(object sender, RoutedEventArgs e)
     {
         Service.IsPumpInServiceMode = !Service.IsPumpInServiceMode;
-        serviceModeButton.Content = Service.IsPumpInServiceMode ? "Disable Service Mode" : "Enable Service Mode";
+        //serviceModeButton.Content = Service.IsPumpInServiceMode ? "Disable Service Mode" : "Enable Service Mode";
+    }
+
+    private void Border_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        ContentDialog cd = new ContentDialog();
+        cd.Title = "Pump";
+        cd.Content = new PumpControl();
+        cd.XamlRoot = this.XamlRoot;
+        cd.PrimaryButtonText = "OK";
+        cd.IsPrimaryButtonEnabled = true;
+        
+        cd.ShowAsync();
     }
 }

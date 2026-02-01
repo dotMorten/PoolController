@@ -21,6 +21,9 @@ public partial class PoolPumpModel : ObservableObject
     private Pentair.PumpMode _mode = Pentair.PumpMode.Unknown;
 
     [ObservableProperty]
+    private TimeSpan _timer;
+
+    [ObservableProperty]
     private Pentair.PumpState _state = Pentair.PumpState.Normal;
 
     [ObservableProperty]
