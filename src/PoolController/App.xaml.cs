@@ -21,7 +21,7 @@ public partial class App : Application
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         MainWindow = new Window();
-        PoolService.Instance.DispatcherQueue = MainWindow.DispatcherQueue;
+        PoolService.Instance.DispatcherQueue = Sensors.Temperature.Instance.DispatcherQueue = MainWindow.DispatcherQueue;
 #if DEBUG
         // MainWindow.UseStudio();
 #endif

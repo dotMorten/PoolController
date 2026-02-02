@@ -23,6 +23,8 @@ public sealed partial class MainPage : Page
         TurnOnScreen();
     }
 
+    public Sensors.Temperature TemperatureSensors => Sensors.Temperature.Instance;
+
     private async void UpdateClock()
     {
         while (true)
