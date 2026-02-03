@@ -1,0 +1,33 @@
+# Pick And Place List
+# eMail=
+#
+# Project=PoolController
+# Date=17:00:01
+# CreatedBy=Fritzing 1.0.6.2025-10-07.CD-2239-0-04e5bb02
+#
+# Coordinates in mils, always center of component
+# Origin 0/0=Lower left corner of PCB. Rotation in degree (0-360, math. pos.)
+RefDes,Description,Package,X,Y,Rotation,Side,Mount
+Description: resistance;capacitance;inductance;voltage;current;power;mpn;mn;
+Via2,";;;;;;;;","",2873.43,717.464,0,Bottom,MANUAL
+Via5,";;;;;;;;","",973.425,1017.46,0,Top,MANUAL
+Via6,";;;;;;;;","",973.425,1417.46,0,Top,MANUAL
+Via7,";;;;;;;;","",973.425,1817.46,0,Top,MANUAL
+Via8,";;;;;;;;","",2873.43,617.464,0,Top,MANUAL
+Via1,";;;;;;;;","",2873.43,717.464,0,Top,MANUAL
+Via3,";;;;;;;;","",3973.43,417.464,0,Top,MANUAL
+Via4,";;;;;;;;","",2173.43,2317.46,0,Top,MANUAL
+ ,";;;;;;;;","THT",373.425,667.464,0,Top,THT
+Temp 4,";;;;;;;;","THT",393.425,1091.36,0,Top,THT
+10K1,"10k;;;;;0.25W;;;","THT",773.425,1017.46,0,Top,THT
+Temp 3,";;;;;;;;","THT",393.425,1491.36,0,Top,THT
+10K,"10k;;;;;0.25W;;;","THT",773.425,1417.46,0,Top,THT
+Temp 2,";;;;;;;;","THT",393.425,1891.36,0,Top,THT
+10K,"10k;;;;;0.25W;;;","THT",773.425,1817.46,0,Top,THT
+485MAX,";;;;;;;;","THT",1973.43,667.464,0,Top,THT
+Temp 1,";;;;;;;;","THT",393.425,2291.36,0,Top,THT
+10K,"10k;;;;;0.25W;;;","THT",773.425,2217.46,0,Top,THT
+Relay,";;;;;;;;","THT",2473.43,1567.46,0,Top,THT
+ADS1115,";;;;;;;;","THT",2173.43,1967.46,0,Top,THT
+ ,";;;;;;;;","THT",3993.43,372.464,0,Top,THT
+ ,";;;;;;;;","THT",3228.43,1367.46,0,Top,THT
