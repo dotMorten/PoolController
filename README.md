@@ -16,4 +16,4 @@ Built with a Raspberry Pi, [.NET 10](https://dot.net) and [Uno Platform](https:/
 - [Pentair Communication Cable](https://amzn.to/45GZWgn)
 - [Temperature Sensors for Pool](https://amzn.to/4tuheHU)
 
-<img width="720" alt="PCB" src="https://github.com/user-attachments/assets/06b030b5-8375-43e1-83c4-ad23e2764253" />
+<img width="676" height="448" alt="pcb" src="https://github.com/user-attachments/assets/13d4992d-ce91-403b-a8c3-ae3734d32519" />
