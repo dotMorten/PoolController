@@ -35,15 +35,23 @@ public sealed partial class MainPage : Page
         }
     }
 
+    private readonly Views.SettingsPage settingsView = new Views.SettingsPage();
     private void Settings_Click(object sender, RoutedEventArgs e)
     {
-        NavFrame.Navigate(typeof(Views.SettingsPage));
+        NavFrame.Content = settingsView;
     }
 
+
+    private readonly Views.StatusView statusView = new Views.StatusView();
     private void Home_Click(object sender, RoutedEventArgs e)
     {
-        NavFrame.Content = new Views.StatusView();
-        //NavFrame.Navigate(typeof(Views.StatusView));
+        NavFrame.Content = statusView;
+    }
+
+    private readonly Views.HeatingView heatingView = new Views.HeatingView();
+    private void Heating_Click(object sender, RoutedEventArgs e)
+    {
+        NavFrame.Content = heatingView;
     }
 
     private DispatcherTimer screenOffTimer;
@@ -77,10 +85,5 @@ public sealed partial class MainPage : Page
         brightness = b;
         string command = $"echo {b} | sudo tee /sys/class/backlight/*/brightness";   
         System.Diagnostics.Process.Start("bash", $"-c \"{command}\"");
-    }
-
-    private void Heating_Click(object sender, RoutedEventArgs e)
-    {
-
     }
 }
