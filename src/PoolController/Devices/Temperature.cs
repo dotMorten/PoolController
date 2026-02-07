@@ -75,7 +75,7 @@ public class Temperature : INotifyPropertyChanged
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Temperature4)));
                 });
             }
-            await Task.Delay(1000).ConfigureAwait(false);
+            await Task.Delay(5000).ConfigureAwait(false);
         }
     }
 
@@ -94,12 +94,26 @@ public class Temperature : INotifyPropertyChanged
 
     public double Temperature4 { get; private set; }
 
-    private static double GetRollingAverage(Queue<double> samples, double newSample, int maxSamples = 10)
+    private static double GetRollingAverage(Queue<double> samples, double newSample, int maxSamples = 30)
     {
         samples.Enqueue(newSample);
         if (samples.Count > maxSamples)
             samples.Dequeue();
-        return Math.Round(samples.Sum() / samples.Count, 1);
+
+        // Oldest item weight = 1, newest item weight = Count
+        double weightedSum = 0.0;
+        int weightTotal = 0;
+        int i = 1; // weight starts at 1 for oldest
+
+        foreach (double s in samples)
+        {
+            weightedSum += s * i;
+            weightTotal += i;
+            i++;
+        }
+
+        double avg = weightedSum / weightTotal;
+        return Math.Round(avg, 1);
     }
 
     public static Temperature Instance { get; } = new Temperature();
