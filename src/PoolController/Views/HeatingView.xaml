@@ -30,19 +30,13 @@
                             Minimum="50" Maximum="100" Value="85" HorizontalAlignment="Stretch"/>
                     <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" Text="{x:Bind ThermostatSlider.Value.ToString('0°F'), Mode=OneWay}"></TextBlock>
                 </Grid>
-                <ComboBox Header="Actuator Valve" SelectedIndex="1" HorizontalAlignment="Stretch">
-                        <ComboBoxItem>Actuator 1</ComboBoxItem>
-                        <ComboBoxItem>Actuator 2</ComboBoxItem>
-                        <ComboBoxItem>Actuator 3</ComboBoxItem>
-                        <ComboBoxItem>Actuator 4</ComboBoxItem>
-                    </ComboBox>
 
-                    <ComboBox Header="Mode" SelectedIndex="0" HorizontalAlignment="Stretch">
-                        <ComboBoxItem>Auto</ComboBoxItem>
-                        <ComboBoxItem>On</ComboBoxItem>
-                        <ComboBoxItem>Off</ComboBoxItem>
-                    </ComboBox>
-                </StackPanel>
+                <ComboBox Header="Mode" SelectedIndex="0" HorizontalAlignment="Stretch">
+                    <ComboBoxItem>Auto</ComboBoxItem>
+                    <ComboBoxItem>On</ComboBoxItem>
+                    <ComboBoxItem>Off</ComboBoxItem>
+                </ComboBox>
+            </StackPanel>
         </Grid>
 
         <Grid Grid.Column="1" VerticalAlignment="Stretch" BorderBrush="Gray" Background="White" CornerRadius="4" Padding="16" ColumnSpacing="8">
