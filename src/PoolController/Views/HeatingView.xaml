@@ -28,7 +28,7 @@
                 <Grid>
                     <Slider Header="Thermostat" x:Name="ThermostatSlider"
                             Minimum="50" Maximum="100" Value="85" HorizontalAlignment="Stretch"/>
-                    <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" Text="{x:Bind ThermostatSlider.Value.ToString('0F'), Mode=OneWay}"></TextBlock>
+                    <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" Text="{x:Bind ThermostatSlider.Value.ToString('0°F'), Mode=OneWay}"></TextBlock>
                 </Grid>
                 <ComboBox Header="Actuator Valve" SelectedIndex="1" HorizontalAlignment="Stretch">
                         <ComboBoxItem>Actuator 1</ComboBoxItem>
@@ -56,7 +56,7 @@
                 <Grid>
                     <Slider Header="Thermostat" x:Name="GasThermostatSlider"
                             Minimum="50" Maximum="100" Value="90"  HorizontalAlignment="Stretch"/>
-                    <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" Text="{x:Bind GasThermostatSlider.Value.ToString('0F'), Mode=OneWay}"></TextBlock>
+                    <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" Text="{x:Bind GasThermostatSlider.Value.ToString('0°F'), Mode=OneWay}"></TextBlock>
                 </Grid>
 
                 <ComboBox Header="Mode" SelectedIndex="0" HorizontalAlignment="Stretch">
