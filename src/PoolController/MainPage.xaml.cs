@@ -23,7 +23,7 @@ public sealed partial class MainPage : Page
         TurnOnScreen();
     }
 
-    public Devices.Temperature TemperatureSensors => Devices.Temperature.Instance;
+    public PoolService PoolService => PoolService.Instance;
 
     private async void UpdateClock()
     {

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
 using Pentair;
+using PoolController.Devices;
 
 namespace PoolController;
 
@@ -15,7 +16,83 @@ public partial class PoolService : ObservableObject
     private PoolService()
     {
         Settings.Instance.PropertyChanged += OnSettingsChanged;
+        Devices.Temperature.Instance.PropertyChanged += Temperature_PropertyChanged;
     }
+
+    private void Temperature_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == "Temperature" + waterTempId)
+        {
+            OnPropertyChanged(nameof(WaterTemperature));
+            CheckHeatingState();
+        }
+        else if (e.PropertyName == "Temperature" + airTempId)
+        {
+            OnPropertyChanged(nameof(AirTemperature));
+            CheckHeatingState();
+        }
+    }
+
+    //TODO: Move these to settings
+    private double solarHeatingTemp = 85;
+    private int waterTempId = 1;
+    private int airTempId = 2;
+    private int solarActuator = 1;
+    private SolarHeatingState solarHeatingState = SolarHeatingState.Auto;
+    private enum SolarHeatingState
+    {
+        Auto, On, Off
+    }
+
+    /// <summary>
+    /// Called when water and air temperature changes, or if there are changes to the solar heating configuration
+    /// </summary>
+    private void CheckHeatingState()
+    {
+        bool isOn = false;
+        if (solarHeatingState == SolarHeatingState.On)
+        {
+            isOn = true;
+        }
+        else if (solarHeatingState == SolarHeatingState.Auto)
+        {
+            if (WaterTemperature < solarHeatingTemp && WaterTemperature < AirTemperature)
+                isOn = true;
+            var isCurrentlyOn = Actuators.Instance.GetActuator(solarActuator);
+            if (isOn != isCurrentlyOn)
+            {
+                // Ensure that we are past a threshold of a full degree before flipping back to reduce frequent cycling from
+                // noise in the sensors
+                if (isCurrentlyOn && WaterTemperature > solarHeatingTemp + 1)
+                {
+                    isOn = false;
+                }
+                else if (!isCurrentlyOn && WaterTemperature < solarHeatingTemp - 1 && WaterTemperature < AirTemperature - 1)
+                {
+                    isOn = true;
+                }
+            }
+        }
+        Actuators.Instance.SetActuator(solarActuator, isOn);
+        // TODO: Check gas heater
+    }
+
+    public double WaterTemperature => GetTemperature(waterTempId);
+
+    public double AirTemperature => GetTemperature(airTempId);
+
+    private double GetTemperature(int sensorId)
+    {
+        switch (sensorId)
+        {
+            case 1: return Devices.Temperature.Instance.Temperature1;
+            case 2: return Devices.Temperature.Instance.Temperature2;
+            case 3: return Devices.Temperature.Instance.Temperature3;
+            case 4: return Devices.Temperature.Instance.Temperature4;
+        }
+        return double.NaN;
+    }
+
     static PoolService()
     {
         Instance = new PoolService();
@@ -32,14 +109,18 @@ public partial class PoolService : ObservableObject
 
     private void OnSettingsChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(Settings.EnableMqtt) || e.PropertyName == nameof(Settings.MqttUsername) || 
+        if (e.PropertyName == nameof(Settings.EnableMqtt) || e.PropertyName == nameof(Settings.MqttUsername) ||
             e.PropertyName == nameof(Settings.MqttPassword) || e.PropertyName == nameof(Settings.MqttBrokerAddress))
         {
             StartMqtt();
         }
-        else if(e.PropertyName == nameof(Settings.PumpComPort))
+        else if (e.PropertyName == nameof(Settings.PumpComPort))
         {
             StartPentairClient();
+        }
+        else if (e.PropertyName?.StartsWith("Solar") == true)
+        {
+            CheckHeatingState();
         }
     }
 
