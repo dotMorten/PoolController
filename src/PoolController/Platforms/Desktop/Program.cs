@@ -21,7 +21,6 @@ internal class Program
         if (host is FrameBufferHost fbh)
         {
             fbh.DisplayScale = 2;
-            MainPage.TurnOnScreen();
         }
         host.Run();
     }

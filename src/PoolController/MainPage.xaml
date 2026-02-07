@@ -19,18 +19,25 @@
 
             <StackPanel Orientation="Horizontal">
                 <AppBarButton Icon="Home" Click="Home_Click" Label="Status"  />
+                <AppBarButton Click="Heating_Click" Label="Heating" >
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xE9CA;" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
                 <AppBarButton Icon="Calendar" Label="Schedules" />
                 <AppBarButton Icon="Setting" Click="Settings_Click" Label="Settings" Grid.Column="1" />
             </StackPanel>
 
 
             <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="8,0">
-                <TextBlock  Grid.Row="1" Text="{x:Bind TemperatureSensors.Temperature0.ToString('Water 0.0°F'), Mode=OneWay}" Grid.Column="1" HorizontalAlignment="Right" FontWeight="Bold" />
+                <TextBlock  Grid.Row="1" Text="{x:Bind TemperatureSensors.Temperature1.ToString('Water 0.0°F'), Mode=OneWay}" Grid.Column="1" HorizontalAlignment="Right" FontWeight="Bold" />
                 <TextBlock x:Name="ClockText" FontWeight="Bold" FontSize="18" HorizontalAlignment="Right" />
             </StackPanel>
 
         </Grid>
         <Frame Grid.Row="1" x:Name="NavFrame" />
-     
+
+        <!-- Block touch input while screen is off -->
+        <Grid Background="Transparent" x:Name="TouchLayer" Visibility="Collapsed" />
     </Grid>
 </Page>

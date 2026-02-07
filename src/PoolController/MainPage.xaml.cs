@@ -23,7 +23,7 @@ public sealed partial class MainPage : Page
         TurnOnScreen();
     }
 
-    public Sensors.Temperature TemperatureSensors => Sensors.Temperature.Instance;
+    public Devices.Temperature TemperatureSensors => Devices.Temperature.Instance;
 
     private async void UpdateClock()
     {
@@ -50,16 +50,25 @@ public sealed partial class MainPage : Page
     
     private void RootPointerMoved(object sender, PointerRoutedEventArgs e)
     {
+        e.Handled = true;
         screenOffTimer.Stop();
         screenOffTimer.Start();
         TurnOnScreen();
     }
 
 
-    public static void TurnOffScreen() => SetBrightness(0);
+    public void TurnOffScreen()
+    {
+        TouchLayer.Visibility = Visibility.Visible;
+        SetBrightness(0);
+    }
 
-    public static void TurnOnScreen() => SetBrightness(255);
-    
+    public void TurnOnScreen()
+    {
+        TouchLayer.Visibility = Visibility.Collapsed;
+        SetBrightness(255);
+    }
+
     static byte brightness = 0;
     public static void SetBrightness(byte b)
     {
@@ -68,5 +77,10 @@ public sealed partial class MainPage : Page
         brightness = b;
         string command = $"echo {b} | sudo tee /sys/class/backlight/*/brightness";   
         System.Diagnostics.Process.Start("bash", $"-c \"{command}\"");
+    }
+
+    private void Heating_Click(object sender, RoutedEventArgs e)
+    {
+
     }
 }

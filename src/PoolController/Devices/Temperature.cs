@@ -1,19 +1,17 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Device.Gpio;
 using System.Device.I2c;
-using System.Diagnostics;
-using System.Text;
-using System.Threading;
 using Iot.Device.Ads1115;
 using Microsoft.UI.Dispatching;
 using UnitsNet;
 
-namespace PoolController.Sensors;
+namespace PoolController.Devices;
 
 public class Temperature : INotifyPropertyChanged
 {
+    private readonly Queue<double> samples1 = new Queue<double>();
+    private readonly Queue<double> samples2 = new Queue<double>();
+    private readonly Queue<double> samples3 = new Queue<double>();
+    private readonly Queue<double> samples4 = new Queue<double>();
     private readonly Ads1115 adc;
 
     private Temperature()
@@ -33,22 +31,12 @@ public class Temperature : INotifyPropertyChanged
     {
         while(true)
         {
-            double temp0 = ReadTemperatureF(InputMultiplexer.AIN0);
-            double temp1 = ReadTemperatureF(InputMultiplexer.AIN1);
-            double temp2 = ReadTemperatureF(InputMultiplexer.AIN2);
-            double temp3 = ReadTemperatureF(InputMultiplexer.AIN3);
-            double avg0 = GetRollingAverage(samples0, temp0);
-            if(Math.Abs(Temperature0 - avg0) >= 0.1)
-            {
-                Temperature0 = avg0;
-                Temperature0Changed?.Invoke(this, Temperature0);
-                DispatcherQueue?.TryEnqueue(DispatcherQueuePriority.Normal, () =>
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Temperature0)));
-                });
-            }
+            double temp1 = ReadTemperatureF(InputMultiplexer.AIN0);
+            double temp2 = ReadTemperatureF(InputMultiplexer.AIN1);
+            double temp3 = ReadTemperatureF(InputMultiplexer.AIN2);
+            double temp4 = ReadTemperatureF(InputMultiplexer.AIN3);
             double avg1 = GetRollingAverage(samples1, temp1);
-            if (Math.Abs(Temperature1 - avg1) >= 0.1)
+            if(Math.Abs(Temperature1 - avg1) >= 0.1)
             {
                 Temperature1 = avg1;
                 Temperature1Changed?.Invoke(this, Temperature1);
@@ -77,25 +65,34 @@ public class Temperature : INotifyPropertyChanged
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Temperature3)));
                 });
             }
+            double avg4 = GetRollingAverage(samples4, temp4);
+            if (Math.Abs(Temperature4 - avg4) >= 0.1)
+            {
+                Temperature4 = avg4;
+                Temperature4Changed?.Invoke(this, Temperature4);
+                DispatcherQueue?.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Temperature4)));
+                });
+            }
             await Task.Delay(1000).ConfigureAwait(false);
         }
     }
 
-    public event EventHandler<double>? Temperature0Changed;
     public event EventHandler<double>? Temperature1Changed;
     public event EventHandler<double>? Temperature2Changed;
     public event EventHandler<double>? Temperature3Changed;
+    public event EventHandler<double>? Temperature4Changed;
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public double Temperature0 { get; private set; }
     public double Temperature1 { get; private set; }
+
     public double Temperature2 { get; private set; }
+
     public double Temperature3 { get; private set; }
 
-    private readonly Queue<double> samples0 = new Queue<double>();
-    private readonly Queue<double> samples1 = new Queue<double>();
-    private readonly Queue<double> samples2 = new Queue<double>();
-    private readonly Queue<double> samples3 = new Queue<double>();
+    public double Temperature4 { get; private set; }
 
     private static double GetRollingAverage(Queue<double> samples, double newSample, int maxSamples = 10)
     {
