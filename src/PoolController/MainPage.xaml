@@ -41,6 +41,6 @@
         <Frame Grid.Row="1" x:Name="NavFrame" />
 
         <!-- Block touch input while screen is off -->
-        <Grid Background="Transparent" x:Name="TouchLayer" Visibility="Collapsed" />
+        <Grid Background="Black" x:Name="TouchLayer" Visibility="Collapsed" Grid.RowSpan="2" />
     </Grid>
 </Page>
