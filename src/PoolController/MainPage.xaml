@@ -24,7 +24,7 @@
                         <FontIcon Glyph="&#xE9CA;" />
                     </AppBarButton.Icon>
                 </AppBarButton>
-                <AppBarButton Icon="Calendar" Label="Schedules" />
+                <!--<AppBarButton Icon="Calendar" Label="Schedules" />-->
                 <AppBarButton Icon="Setting" Click="Settings_Click" Label="Settings" Grid.Column="1" />
             </StackPanel>
 

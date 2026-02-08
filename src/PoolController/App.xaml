@@ -13,6 +13,15 @@
         <ToolkitResources xmlns="using:Uno.Toolkit.UI" />
       </ResourceDictionary.MergedDictionaries>
 
+            <Style x:Key="GridPanel" TargetType="Grid">
+                <Setter Property="VerticalAlignment" Value="Stretch" />
+                <Setter Property="BorderBrush" Value="LightGray" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Background" Value="White" />
+                <Setter Property="CornerRadius" Value="4" />
+                <Setter Property="Padding" Value="16" />
+                <Setter Property="ColumnSpacing" Value="8" />
+            </Style>
 
             <Style TargetType="ComboBox" x:Key="ComboBoxHeaderLeft" BasedOn="{StaticResource DefaultComboBoxStyle}">
                 <Setter Property="HorizontalAlignment" Value="Stretch" />

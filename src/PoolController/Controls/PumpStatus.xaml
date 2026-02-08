@@ -7,20 +7,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DesignHeight="320"
-    d:DesignWidth="400">
+    d:DesignWidth="400" >
 
-
-
-    <Border Tapped="Border_Tapped"
-        HorizontalAlignment="Stretch"
-        VerticalAlignment="Stretch"
-        CornerRadius="16"
-        Background="White"
-        BorderBrush="#2A2F36"
-        BorderThickness="1">
-
-        <Grid>
-        <Grid RowSpacing="14" Margin="20">
+    <Grid>
+        <Grid RowSpacing="14">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -106,15 +96,23 @@
                        Opacity="0.6"
                        FontSize="12" VerticalAlignment="Center"/>-->
 
-            <!--<ToggleButton Grid.Row="3" Content="Enable Service Mode" x:Name="serviceModeButton"
-                       Click="serviceModeButton_Click" ClickMode="Press" HorizontalAlignment="Stretch"
-                              />-->
+            <Grid Grid.Row="3" ColumnSpacing="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <ToggleButton Content="Skimmer" x:Name="SkimmerButton" Click="SkimmerClick" ClickMode="Press" HorizontalAlignment="Stretch" />
+                <ToggleButton Content="Vacuum" x:Name="VacuumButton" Click="VacuumClick" ClickMode="Press" HorizontalAlignment="Stretch" Grid.Column="1" />
             </Grid>
-            <Grid Background="#33ff0000" Margin="-2" BorderBrush="Red" CornerRadius="16" BorderThickness="2" Visibility="{x:Bind Service.IsPumpInServiceMode, Mode=OneWay}">
-                <TextBlock HorizontalAlignment="Center" Foreground="#AAFF0000"
+            <Border Background="Transparent"
+                    Grid.RowSpan="3"
+                    Tapped="Border_Tapped"
+                    />
+        </Grid>
+        <Grid Background="#33ff0000" Margin="-2" BorderBrush="Red" CornerRadius="16" BorderThickness="2" Visibility="{x:Bind Service.IsPumpInServiceMode, Mode=OneWay}">
+            <TextBlock HorizontalAlignment="Center" Foreground="#AAFF0000"
                            VerticalAlignment="Bottom" Margin="0,0,0,-6" FontWeight="Bold" FontSize="38"
                            Text="Service Mode" />
-            </Grid>
         </Grid>
-    </Border>
+    </Grid>
 </UserControl>

@@ -10,14 +10,11 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid Padding="6" ColumnSpacing="6">
-        <Grid.Resources>
-            <x:Double x:Key="SettingsCardWrapThreshold">800</x:Double>
-        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Grid VerticalAlignment="Stretch" BorderBrush="Gray" Background="White" CornerRadius="4" Padding="16" ColumnSpacing="8">
+        <Grid Style="{StaticResource GridPanel}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30" />
                 <ColumnDefinition />
@@ -39,7 +36,7 @@
             </StackPanel>
         </Grid>
 
-        <Grid Grid.Column="1" VerticalAlignment="Stretch" BorderBrush="Gray" Background="White" CornerRadius="4" Padding="16" ColumnSpacing="8">
+        <Grid Grid.Column="1" Style="{StaticResource GridPanel}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30" />
                 <ColumnDefinition />
