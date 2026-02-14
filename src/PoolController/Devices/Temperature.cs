@@ -121,7 +121,7 @@ public class Temperature : INotifyPropertyChanged
     private double ReadTemperatureF(InputMultiplexer input)
     {
         ElectricPotential voltage = ReadVoltage(input);
-        double resistance = (3300 - voltage.Millivolts) * 10000 / voltage.Millivolts;
+        double resistance = (5000 - voltage.Millivolts) * 10000 / voltage.Millivolts;
         double temperatureC = 1 / (Math.Log(resistance / 10000) / 3950 + 1 / (25 + 273.15)) - 273.15;
         return temperatureC * 9 / 5 + 32;
     }
