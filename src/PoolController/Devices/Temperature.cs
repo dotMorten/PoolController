@@ -56,17 +56,17 @@ public class Temperature : INotifyPropertyChanged
             double temp3 = ReadTemperatureF(InputMultiplexer.AIN2);
             double temp4 = ReadTemperatureF(InputMultiplexer.AIN3);
             double avg1 = GetRollingAverage(samples1, temp1);
-            if(Math.Abs(Temperature1 - avg1) >= 0.1)
+            if(double.IsNaN(_temperature1) || Math.Abs(Temperature1 - avg1) >= 0.1)
             {
                 this._temperature1 = avg1;
-                Temperature1Changed?.Invoke(this, Temperature1);
+                Temperature1Changed?.Invoke(this, _temperature1);
                 DispatcherQueue?.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Temperature1)));
                 });
             }
             double avg2 = GetRollingAverage(samples2, temp2);
-            if (Math.Abs(Temperature2 - avg2) >= 0.1)
+            if (double.IsNaN(_temperature2) || Math.Abs(_temperature2 - avg2) >= 0.1)
             {
                 this._temperature2 = avg2;
                 Temperature2Changed?.Invoke(this, Temperature2);
@@ -76,7 +76,7 @@ public class Temperature : INotifyPropertyChanged
                 });
             }
             double avg3 = GetRollingAverage(samples3, temp3);
-            if (Math.Abs(Temperature3 - avg3) >= 0.1)
+            if (double.IsNaN(_temperature3) || Math.Abs(_temperature3 - avg3) >= 0.1)
             {
                 this._temperature3 = avg3;
                 Temperature3Changed?.Invoke(this, Temperature3);
@@ -86,7 +86,7 @@ public class Temperature : INotifyPropertyChanged
                 });
             }
             double avg4 = GetRollingAverage(samples4, temp4);
-            if (Math.Abs(Temperature4 - avg4) >= 0.1)
+            if (double.IsNaN(_temperature4) || Math.Abs(_temperature4 - avg4) >= 0.1)
             {
                 this._temperature4 = avg4;
                 Temperature4Changed?.Invoke(this, Temperature4);
