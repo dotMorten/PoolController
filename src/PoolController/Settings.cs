@@ -92,6 +92,26 @@ public partial class Settings : SettingsBase
     }
 
     public TempSensorSettings TempSettings { get; } = new TempSensorSettings();
+
+    public SolarHeatingMode SolarHeatingMode
+    {
+        get => GetSetting(SolarHeatingMode.Auto);
+        set => SetSetting(value);
+    }
+
+    public double SolarHeatingTemp
+    {
+        get => GetSetting(85d);
+        set => SetSetting(value);
+    }
+
+    public int SolarActuatorId { get; } = 1;
+}
+public enum SolarHeatingMode : int
+{
+    Auto = 0,
+    On = 1,
+    Off = 2
 }
 
 public partial class TempSensorSettings : SettingsBase

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
@@ -16,6 +17,7 @@ public partial class PoolService : ObservableObject
         Settings.Instance.PropertyChanged += OnSettingsChanged;
         Settings.Instance.TempSettings.PropertyChanged += OnTemperatureSettingsChanged;
         Devices.Temperature.Instance.PropertyChanged += Temperature_PropertyChanged;
+        CheckHeatingState();
     }
 
     private void Temperature_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -34,14 +36,10 @@ public partial class PoolService : ObservableObject
         {
             CheckHeatingState();
         }
-    }
-
-    private double solarHeatingTemp = 85;
-    private int solarActuator = 1;
-    private SolarHeatingState solarHeatingState = SolarHeatingState.Auto;
-    private enum SolarHeatingState
-    {
-        Auto, On, Off
+        else if (e.PropertyName == nameof(Settings.SolarHeatingMode) || e.PropertyName == nameof(Settings.SolarHeatingTemp))
+        {
+            CheckHeatingState();
+        }
     }
 
     /// <summary>
@@ -50,41 +48,57 @@ public partial class PoolService : ObservableObject
     private void CheckHeatingState()
     {
         bool isOn = false;
-        if (solarHeatingState == SolarHeatingState.On)
+        var solarHeatingState = Settings.Instance.SolarHeatingMode;
+        double solarHeatingTemp = Settings.Instance.SolarHeatingTemp;
+        if (solarHeatingState == SolarHeatingMode.On)
         {
             isOn = true;
         }
-        else if (solarHeatingState == SolarHeatingState.Auto)
+        else if (solarHeatingState == SolarHeatingMode.Auto)
         {
             var airTemp = SolarAirTemperature;
             if (double.IsNaN(SolarAirTemperature)) // If we don't have a solar air sensor, fallback to air temp
             {
                 airTemp = AirTemperature;
             }
-            if (double.IsNaN(airTemp) || double.IsNaN(WaterTemperature))
+            if (!double.IsNaN(airTemp) && !double.IsNaN(WaterTemperature)) // If we don't have the necessary temperatures, don't change the current state
             {
-                // If we don't have the necessary temperatures, don't change the current state
-                return;
-            }
-            if (WaterTemperature < solarHeatingTemp && WaterTemperature < AirTemperature)
-                isOn = true;
-            var isCurrentlyOn = Actuators.Instance.GetActuator(solarActuator);
-            if (isOn != isCurrentlyOn)
-            {
-                // Ensure that we are past a threshold of a full degree before flipping back to reduce frequent cycling from
-                // noise in the sensors
-                if (isCurrentlyOn && WaterTemperature > solarHeatingTemp + 1)
-                {
-                    isOn = false;
-                }
-                else if (!isCurrentlyOn && WaterTemperature < solarHeatingTemp - 1 && WaterTemperature < AirTemperature - 1)
-                {
+                if (WaterTemperature < solarHeatingTemp && WaterTemperature < airTemp)
                     isOn = true;
+                if (isOn != IsSolarHeating)
+                {
+                    // Ensure that we are past a threshold of a full degree before flipping back to reduce frequent cycling from
+                    // noise in the sensors
+                    if (IsSolarHeating && WaterTemperature > solarHeatingTemp + 1)
+                    {
+                        isOn = false;
+                    }
+                    else if (!IsSolarHeating && WaterTemperature < solarHeatingTemp - 1 && WaterTemperature < airTemp - 1)
+                    {
+                        isOn = true;
+                    }
                 }
             }
         }
-        Actuators.Instance.SetActuator(solarActuator, isOn);
+        IsSolarHeating = isOn;
+        
         // TODO: Check gas heater
+    }
+
+    private bool _isSolarHeating;
+
+    public bool IsSolarHeating
+    {
+        get { return _isSolarHeating; }
+        private set
+        {
+            if (_isSolarHeating != value)
+            {
+                _isSolarHeating = value;
+                Actuators.Instance.SetActuator(Settings.Instance.SolarActuatorId, value);
+                OnPropertyChanged();
+            }
+        }
     }
 
     public double WaterTemperature => GetTemperature(TemperatureSensorType.WaterTemperature);

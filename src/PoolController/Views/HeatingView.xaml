@@ -24,11 +24,11 @@
                     <TextBlock Text="Solar Heating" />
                 <Grid>
                     <Slider Header="Thermostat" x:Name="ThermostatSlider"
-                            Minimum="50" Maximum="100" Value="85" HorizontalAlignment="Stretch"/>
+                            Minimum="50" Maximum="100" Value="{x:Bind Settings.SolarHeatingTemp, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
                     <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" Text="{x:Bind ThermostatSlider.Value.ToString('0°F'), Mode=OneWay}"></TextBlock>
                 </Grid>
 
-                <ComboBox Header="Mode" SelectedIndex="0" HorizontalAlignment="Stretch">
+                <ComboBox Header="Mode" SelectedIndex="0" HorizontalAlignment="Stretch" x:Name="SolarHeatingSelector" SelectionChanged="SolarHeatingModeChanged">
                     <ComboBoxItem>Auto</ComboBoxItem>
                     <ComboBoxItem>On</ComboBoxItem>
                     <ComboBoxItem>Off</ComboBoxItem>
@@ -45,12 +45,12 @@
             <StackPanel Grid.Column="1" Spacing="8">
                 <TextBlock Text="Gas Heating" />
                 <Grid>
-                    <Slider Header="Thermostat" x:Name="GasThermostatSlider"
+                    <Slider Header="Thermostat" x:Name="GasThermostatSlider" IsEnabled="False"
                             Minimum="50" Maximum="100" Value="90"  HorizontalAlignment="Stretch"/>
                     <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" Text="{x:Bind GasThermostatSlider.Value.ToString('0°F'), Mode=OneWay}"></TextBlock>
                 </Grid>
 
-                <ComboBox Header="Mode" SelectedIndex="0" HorizontalAlignment="Stretch">
+                <ComboBox Header="Mode" SelectedIndex="0" HorizontalAlignment="Stretch" IsEnabled="False">
                     <ComboBoxItem>Off</ComboBoxItem>
                     <ComboBoxItem>On</ComboBoxItem>
                 </ComboBox>
