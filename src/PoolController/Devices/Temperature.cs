@@ -52,11 +52,8 @@ public class Temperature : INotifyPropertyChanged
         while(true)
         {
             double temp1 = ReadTemperatureF(InputMultiplexer.AIN0);
-            double temp2 = ReadTemperatureF(InputMultiplexer.AIN1);
-            double temp3 = ReadTemperatureF(InputMultiplexer.AIN2);
-            double temp4 = ReadTemperatureF(InputMultiplexer.AIN3);
             double avg1 = GetRollingAverage(samples1, temp1);
-            if(double.IsNaN(_temperature1) || Math.Abs(Temperature1 - avg1) >= 0.1)
+            if(double.IsNaN(_temperature1) || Math.Abs(_temperature1 - avg1) >= 0.1)
             {
                 this._temperature1 = avg1;
                 Temperature1Changed?.Invoke(this, _temperature1);
@@ -65,6 +62,8 @@ public class Temperature : INotifyPropertyChanged
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Temperature1)));
                 });
             }
+
+            double temp2 = ReadTemperatureF(InputMultiplexer.AIN1);
             double avg2 = GetRollingAverage(samples2, temp2);
             if (double.IsNaN(_temperature2) || Math.Abs(_temperature2 - avg2) >= 0.1)
             {
@@ -75,6 +74,8 @@ public class Temperature : INotifyPropertyChanged
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Temperature2)));
                 });
             }
+
+            double temp3 = ReadTemperatureF(InputMultiplexer.AIN2);
             double avg3 = GetRollingAverage(samples3, temp3);
             if (double.IsNaN(_temperature3) || Math.Abs(_temperature3 - avg3) >= 0.1)
             {
@@ -85,6 +86,8 @@ public class Temperature : INotifyPropertyChanged
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Temperature3)));
                 });
             }
+
+            double temp4 = ReadTemperatureF(InputMultiplexer.AIN3);
             double avg4 = GetRollingAverage(samples4, temp4);
             if (double.IsNaN(_temperature4) || Math.Abs(_temperature4 - avg4) >= 0.1)
             {
@@ -120,6 +123,8 @@ public class Temperature : INotifyPropertyChanged
 
     private static double GetRollingAverage(Queue<double> samples, double newSample, int maxSamples = 30)
     {
+        if (double.IsNaN(newSample))
+            return double.NaN;
         samples.Enqueue(newSample);
         if (samples.Count > maxSamples)
             samples.Dequeue();
@@ -143,7 +148,7 @@ public class Temperature : INotifyPropertyChanged
     public static Temperature Instance { get; } = new Temperature();
 
     // Constants for thermistor calculation
-    private const double SupplyVoltageMv = 3300.0; // millivolts
+    private const double SupplyVoltageMv = 5100.0; // millivolts
     private const double FixedResistorOhms = 10000.0; // ohms
     private const double ReferenceResistanceOhms = 10000.0; // ohms
     private const double BetaCoefficient = 3950.0; // beta value

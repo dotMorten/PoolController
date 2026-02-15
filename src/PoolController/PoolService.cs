@@ -48,7 +48,7 @@ public partial class PoolService : ObservableObject
             }
             if (!double.IsNaN(airTemp) && !double.IsNaN(WaterTemperature)) // If we don't have the necessary temperatures, don't change the current state
             {
-                if(airTemp < WaterTemperature - 1) // If the air temp is significantly lower than the water temp, don't turn on solar heating to avoid cooling the pool
+                if (airTemp - 1 < WaterTemperature) // If the air temp is isn't warmer than the water, don't turn on solar heating to avoid cooling the pool
                 {
                     isOn = false;
                 }
@@ -147,9 +147,24 @@ public partial class PoolService : ObservableObject
         {
             StartPentairClient();
         }
-        else if (e.PropertyName?.StartsWith("Solar") == true)
+        else if (e.PropertyName == nameof(Settings.SolarActuatorId))
+        {
+            if (Settings.Instance.SolarActuatorId > 0)
+            {
+                Actuators.Instance.SetActuator(Settings.Instance.SolarActuatorId, IsSolarHeating);
+            }
+        }
+        else if (e.PropertyName == nameof(Settings.SolarHeatingMode) || e.PropertyName == nameof(Settings.SolarHeatingTemp))
         {
             CheckHeatingState();
+        }
+        else if (e.PropertyName == nameof(Settings.VacuumEnabled) || e.PropertyName == nameof(Settings.VacuumActuatorId))
+        {
+            if (Settings.Instance.VacuumActuatorId > 0)
+            {
+                Actuators.Instance.SetActuator(Settings.Instance.VacuumActuatorId, Settings.Instance.VacuumEnabled);
+            }
+            Log.LogMessage($"Turning {(Settings.Instance.VacuumEnabled ? "on" : "off")} vacuum.");
         }
     }
 
@@ -168,18 +183,6 @@ public partial class PoolService : ObservableObject
         else if (e.PropertyName == "Temperature" + Settings.Instance.TempSettings.GetTemperatureSensorId(TemperatureSensorType.SolarAirTemperature))
         {
             CheckHeatingState();
-        }
-        else if (e.PropertyName == nameof(Settings.SolarHeatingMode) || e.PropertyName == nameof(Settings.SolarHeatingTemp))
-        {
-            CheckHeatingState();
-        }
-        else if (e.PropertyName == nameof(Settings.VacuumEnabled))
-        {
-            if (Settings.Instance.VacuumActuatorId > 0)
-            {
-                Actuators.Instance.SetActuator(Settings.Instance.VacuumActuatorId, Settings.Instance.VacuumEnabled);
-            }
-            Log.LogMessage($"Turning {(Settings.Instance.VacuumEnabled ? "on" : "off")} vacuum.");
         }
     }
 
