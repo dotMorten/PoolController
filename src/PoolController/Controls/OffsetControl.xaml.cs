@@ -22,7 +22,7 @@ public sealed partial class OffsetControl : UserControl
     public OffsetControl()
     {
         this.InitializeComponent();
-        OffsetText.Text = "0.0";
+        OffsetText.Text = "+0.0";
     }
 
     private void IncreaseOffset_Click(object sender, RoutedEventArgs e)

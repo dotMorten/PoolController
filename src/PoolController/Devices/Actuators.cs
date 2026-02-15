@@ -16,17 +16,23 @@ internal class Actuators
 
     private Actuators()
     {
-        if (!System.OperatingSystem.IsLinux())
-            return;
-        controller = new GpioController();
-        controller.OpenPin(actuator1Pin);
-        controller.OpenPin(actuator2Pin);
-        controller.OpenPin(actuator3Pin);
-        controller.OpenPin(actuator4Pin);
-        controller.SetPinMode(actuator1Pin, PinMode.Output);
-        controller.SetPinMode(actuator2Pin, PinMode.Output);
-        controller.SetPinMode(actuator3Pin, PinMode.Output);
-        controller.SetPinMode(actuator4Pin, PinMode.Output);
+        try
+        {
+            controller = new GpioController();
+            controller.OpenPin(actuator1Pin);
+            controller.OpenPin(actuator2Pin);
+            controller.OpenPin(actuator3Pin);
+            controller.OpenPin(actuator4Pin);
+            controller.SetPinMode(actuator1Pin, PinMode.Output);
+            controller.SetPinMode(actuator2Pin, PinMode.Output);
+            controller.SetPinMode(actuator3Pin, PinMode.Output);
+            controller.SetPinMode(actuator4Pin, PinMode.Output);
+            Log.LogMessage("GPIO controller for actuators initialized.");
+        }
+        catch (System.Exception ex)
+        {
+            Log.LogError("Failed to initialize GPIO controller: " + ex.Message);
+        }
     }
 
     public static Actuators Instance { get; } = new Actuators();

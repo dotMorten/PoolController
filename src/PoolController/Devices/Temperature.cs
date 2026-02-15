@@ -17,13 +17,18 @@ public class Temperature : INotifyPropertyChanged
     private Temperature()
     {
         Settings.Instance.TempSettings.PropertyChanged += TempSettings_PropertyChanged;
-        if (!System.OperatingSystem.IsLinux())
-            return;
-        I2cConnectionSettings settings = new(1, (int)I2cAddress.GND);
-        I2cDevice device = I2cDevice.Create(settings);
-        device = I2cDevice.Create(settings);
-        adc = new Ads1115(device, InputMultiplexer.AIN0, MeasuringRange.FS4096, DataRate.SPS250, DeviceMode.Continuous);
-        StartReadLoop();
+        try
+        {
+            I2cConnectionSettings settings = new(1, (int)I2cAddress.GND);
+            I2cDevice device = I2cDevice.Create(settings);
+            device = I2cDevice.Create(settings);
+            adc = new Ads1115(device, InputMultiplexer.AIN0, MeasuringRange.FS4096, DataRate.SPS250, DeviceMode.Continuous);
+            StartReadLoop();
+        }
+        catch(System.Exception ex)
+        {
+            Log.LogError("Failed to start temperature sensor read loop: " + ex.Message);
+        }
     }
 
     private void TempSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -43,6 +48,7 @@ public class Temperature : INotifyPropertyChanged
 
     private async void StartReadLoop()
     {
+        Log.LogMessage("Temperature sensor read loop started.");
         while(true)
         {
             double temp1 = ReadTemperatureF(InputMultiplexer.AIN0);
