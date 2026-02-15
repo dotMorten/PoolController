@@ -83,6 +83,8 @@ public sealed partial class MainPage : Page
         if(brightness == b)
             return;
         brightness = b;
+        if (!System.OperatingSystem.IsLinux())
+            return;
         string command = $"echo {b} | sudo tee /sys/class/backlight/*/brightness";   
         System.Diagnostics.Process.Start("bash", $"-c \"{command}\"");
     }

@@ -24,33 +24,51 @@
             <TextBlock Text="{x:Bind Sensors.Temperature3.ToString('0.0°F'), Mode=OneWay}" Grid.Row="2" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="16" />
             <TextBlock Text="{x:Bind Sensors.Temperature4.ToString('0.0°F'), Mode=OneWay}" Grid.Row="3" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="16" />
 
-            <ComboBox SelectedIndex="0" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch">
-                <ComboBoxItem>Pool</ComboBoxItem>
-                <ComboBoxItem>Pool Return</ComboBoxItem>
-                <ComboBoxItem>Air</ComboBoxItem>
+            <ComboBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" x:Name="Sensor1Selector" SelectionChanged="Sensor1SelectionChanged">
                 <ComboBoxItem>Disabled</ComboBoxItem>
+                <ComboBoxItem>Water</ComboBoxItem>
+                <ComboBoxItem>Air</ComboBoxItem>
+                <ComboBoxItem>Return</ComboBoxItem>
+                <ComboBoxItem>Aux 1</ComboBoxItem>
+                <ComboBoxItem>Aux 2</ComboBoxItem>
+                <ComboBoxItem>Aux 3</ComboBoxItem>
+                <ComboBoxItem>Aux 4</ComboBoxItem>
             </ComboBox>
             <controls:OffsetControl Offset="{x:Bind Settings.Temp1Offset, Mode=TwoWay}" Grid.Column="2" Grid.Row="0" />
 
-            <ComboBox SelectedIndex="0" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch">
-                <ComboBoxItem>Pool</ComboBoxItem>
-                <ComboBoxItem>Pool Return</ComboBoxItem>
-                <ComboBoxItem>Air</ComboBoxItem>
+            <ComboBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" x:Name="Sensor2Selector" SelectionChanged="Sensor2SelectionChanged">
                 <ComboBoxItem>Disabled</ComboBoxItem>
+                <ComboBoxItem>Water</ComboBoxItem>
+                <ComboBoxItem>Air</ComboBoxItem>
+                <ComboBoxItem>Return</ComboBoxItem>
+                <ComboBoxItem>Aux 1</ComboBoxItem>
+                <ComboBoxItem>Aux 2</ComboBoxItem>
+                <ComboBoxItem>Aux 3</ComboBoxItem>
+                <ComboBoxItem>Aux 4</ComboBoxItem>
             </ComboBox>
             <controls:OffsetControl Offset="{x:Bind Settings.Temp2Offset, Mode=TwoWay}" Grid.Column="2" Grid.Row="1" />
-            <ComboBox SelectedIndex="0" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch">
-                <ComboBoxItem>Pool</ComboBoxItem>
-                <ComboBoxItem>Pool Return</ComboBoxItem>
-                <ComboBoxItem>Air</ComboBoxItem>
+
+            <ComboBox Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" x:Name="Sensor3Selector" SelectionChanged="Sensor3SelectionChanged">
                 <ComboBoxItem>Disabled</ComboBoxItem>
+                <ComboBoxItem>Water</ComboBoxItem>
+                <ComboBoxItem>Air</ComboBoxItem>
+                <ComboBoxItem>Return</ComboBoxItem>
+                <ComboBoxItem>Aux 1</ComboBoxItem>
+                <ComboBoxItem>Aux 2</ComboBoxItem>
+                <ComboBoxItem>Aux 3</ComboBoxItem>
+                <ComboBoxItem>Aux 4</ComboBoxItem>
             </ComboBox>
             <controls:OffsetControl Offset="{x:Bind Settings.Temp3Offset, Mode=TwoWay}" Grid.Column="2" Grid.Row="2" />
-            <ComboBox SelectedIndex="0" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch">
-                <ComboBoxItem>Pool</ComboBoxItem>
-                <ComboBoxItem>Pool Return</ComboBoxItem>
-                <ComboBoxItem>Air</ComboBoxItem>
+
+            <ComboBox Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" x:Name="Sensor4Selector" SelectionChanged="Sensor4SelectionChanged">
                 <ComboBoxItem>Disabled</ComboBoxItem>
+                <ComboBoxItem>Water</ComboBoxItem>
+                <ComboBoxItem>Air</ComboBoxItem>
+                <ComboBoxItem>Return</ComboBoxItem>
+                <ComboBoxItem>Aux 1</ComboBoxItem>
+                <ComboBoxItem>Aux 2</ComboBoxItem>
+                <ComboBoxItem>Aux 3</ComboBoxItem>
+                <ComboBoxItem>Aux 4</ComboBoxItem>
             </ComboBox>
             <controls:OffsetControl Offset="{x:Bind Settings.Temp4Offset, Mode=TwoWay}" Grid.Column="2" Grid.Row="3" />
         </Grid>

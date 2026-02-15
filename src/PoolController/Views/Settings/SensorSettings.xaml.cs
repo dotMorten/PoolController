@@ -20,9 +20,30 @@ public sealed partial class SensorSettings : UserControl
     public SensorSettings()
     {
         this.InitializeComponent();
+        Sensor1Selector.SelectedIndex = (int)Settings.Temp1Type;
+        Sensor2Selector.SelectedIndex = (int)Settings.Temp2Type;
+        Sensor3Selector.SelectedIndex = (int)Settings.Temp3Type;
+        Sensor4Selector.SelectedIndex = (int)Settings.Temp4Type;
     }
 
     public PoolController.TempSensorSettings Settings => PoolController.Settings.Instance.TempSettings;
 
     public Devices.Temperature Sensors => Devices.Temperature.Instance;
+
+    private void Sensor1SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        Settings.Temp1Type = (TemperatureSensorType)Sensor1Selector.SelectedIndex;
+    }
+    private void Sensor2SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        Settings.Temp2Type = (TemperatureSensorType)Sensor2Selector.SelectedIndex;
+    }
+    private void Sensor3SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        Settings.Temp3Type = (TemperatureSensorType)Sensor3Selector.SelectedIndex;
+    }
+    private void Sensor4SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        Settings.Temp4Type = (TemperatureSensorType)Sensor4Selector.SelectedIndex;
+    }
 }
