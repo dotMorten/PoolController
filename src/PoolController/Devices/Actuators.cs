@@ -62,24 +62,24 @@ internal class Actuators
     public bool Actuator1
     {
         get => controller?.Read(actuator1Pin) == PinValue.High;
-        set => controller?.Write(actuator1Pin, PinValue.High);
+        set => controller?.Write(actuator1Pin, value ? PinValue.High : PinValue.Low);
     }
     
     public bool Actuator2
     {
         get => controller?.Read(actuator2Pin) == PinValue.High;
-        set => controller?.Write(actuator2Pin, PinValue.High);
+        set => controller?.Write(actuator2Pin, value ? PinValue.High : PinValue.Low);
     }
     
     public bool Actuator3
     {
         get => controller?.Read(actuator3Pin) == PinValue.High;
-        set => controller?.Write(actuator3Pin, PinValue.High);
+        set => controller?.Write(actuator3Pin, value ? PinValue.High : PinValue.Low);
     }
 
     public bool Actuator4
     {
         get => controller?.Read(actuator4Pin) == PinValue.High;
-        set => controller?.Write(actuator4Pin, PinValue.High);
+        set => controller?.Write(actuator4Pin, value ? PinValue.High : PinValue.Low);
     }
 }
