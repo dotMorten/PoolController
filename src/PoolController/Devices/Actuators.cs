@@ -19,6 +19,10 @@ internal class Actuators
         if (!System.OperatingSystem.IsLinux())
             return;
         controller = new GpioController();
+        controller.OpenPin(actuator1Pin);
+        controller.OpenPin(actuator2Pin);
+        controller.OpenPin(actuator3Pin);
+        controller.OpenPin(actuator4Pin);
         controller.SetPinMode(actuator1Pin, PinMode.Output);
         controller.SetPinMode(actuator2Pin, PinMode.Output);
         controller.SetPinMode(actuator3Pin, PinMode.Output);
