@@ -27,8 +27,9 @@
             <ComboBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" x:Name="Sensor1Selector" SelectionChanged="Sensor1SelectionChanged">
                 <ComboBoxItem>Disabled</ComboBoxItem>
                 <ComboBoxItem>Water</ComboBoxItem>
-                <ComboBoxItem>Air</ComboBoxItem>
                 <ComboBoxItem>Return</ComboBoxItem>
+                <ComboBoxItem>Air</ComboBoxItem>
+                <ComboBoxItem>Solar</ComboBoxItem>
                 <ComboBoxItem>Aux 1</ComboBoxItem>
                 <ComboBoxItem>Aux 2</ComboBoxItem>
                 <ComboBoxItem>Aux 3</ComboBoxItem>
@@ -39,8 +40,9 @@
             <ComboBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" x:Name="Sensor2Selector" SelectionChanged="Sensor2SelectionChanged">
                 <ComboBoxItem>Disabled</ComboBoxItem>
                 <ComboBoxItem>Water</ComboBoxItem>
-                <ComboBoxItem>Air</ComboBoxItem>
                 <ComboBoxItem>Return</ComboBoxItem>
+                <ComboBoxItem>Air</ComboBoxItem>
+                <ComboBoxItem>Solar</ComboBoxItem>
                 <ComboBoxItem>Aux 1</ComboBoxItem>
                 <ComboBoxItem>Aux 2</ComboBoxItem>
                 <ComboBoxItem>Aux 3</ComboBoxItem>
@@ -51,8 +53,9 @@
             <ComboBox Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" x:Name="Sensor3Selector" SelectionChanged="Sensor3SelectionChanged">
                 <ComboBoxItem>Disabled</ComboBoxItem>
                 <ComboBoxItem>Water</ComboBoxItem>
-                <ComboBoxItem>Air</ComboBoxItem>
                 <ComboBoxItem>Return</ComboBoxItem>
+                <ComboBoxItem>Air</ComboBoxItem>
+                <ComboBoxItem>Solar</ComboBoxItem>
                 <ComboBoxItem>Aux 1</ComboBoxItem>
                 <ComboBoxItem>Aux 2</ComboBoxItem>
                 <ComboBoxItem>Aux 3</ComboBoxItem>
@@ -63,8 +66,9 @@
             <ComboBox Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" x:Name="Sensor4Selector" SelectionChanged="Sensor4SelectionChanged">
                 <ComboBoxItem>Disabled</ComboBoxItem>
                 <ComboBoxItem>Water</ComboBoxItem>
-                <ComboBoxItem>Air</ComboBoxItem>
                 <ComboBoxItem>Return</ComboBoxItem>
+                <ComboBoxItem>Air</ComboBoxItem>
+                <ComboBoxItem>Solar</ComboBoxItem>
                 <ComboBoxItem>Aux 1</ComboBoxItem>
                 <ComboBoxItem>Aux 2</ComboBoxItem>
                 <ComboBoxItem>Aux 3</ComboBoxItem>

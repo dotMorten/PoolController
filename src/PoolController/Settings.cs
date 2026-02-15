@@ -164,10 +164,11 @@ public enum TemperatureSensorType : int
 {
     Disabled = 0,
     WaterTemperature = 1,
-    AirTemperature = 2,
-    ReturnTemperature = 3,
-    Aux1 = 4,
-    Aux2 = 5,
-    Aux3 = 6,
-    Aux4 = 7
+    ReturnTemperature = 2,
+    AirTemperature = 3,
+    SolarAirTemperature = 4,
+    Aux1 = 5,
+    Aux2 = 6,
+    Aux3 = 7,
+    Aux4 = 8
 }

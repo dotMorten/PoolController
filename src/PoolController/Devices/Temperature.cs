@@ -143,7 +143,7 @@ public class Temperature : INotifyPropertyChanged
     public static Temperature Instance { get; } = new Temperature();
 
     // Constants for thermistor calculation
-    private const double SupplyVoltageMv = 5100.0; // millivolts
+    private const double SupplyVoltageMv = 3300.0; // millivolts
     private const double FixedResistorOhms = 10000.0; // ohms
     private const double ReferenceResistanceOhms = 10000.0; // ohms
     private const double BetaCoefficient = 3950.0; // beta value

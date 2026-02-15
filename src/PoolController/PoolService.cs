@@ -30,6 +30,10 @@ public partial class PoolService : ObservableObject
             OnPropertyChanged(nameof(AirTemperature));
             CheckHeatingState();
         }
+        else if (e.PropertyName == "Temperature" + Settings.Instance.TempSettings.GetTemperatureSensorId(TemperatureSensorType.SolarAirTemperature))
+        {
+            CheckHeatingState();
+        }
     }
 
     private double solarHeatingTemp = 85;
@@ -52,6 +56,16 @@ public partial class PoolService : ObservableObject
         }
         else if (solarHeatingState == SolarHeatingState.Auto)
         {
+            var airTemp = SolarAirTemperature;
+            if (double.IsNaN(SolarAirTemperature)) // If we don't have a solar air sensor, fallback to air temp
+            {
+                airTemp = AirTemperature;
+            }
+            if (double.IsNaN(airTemp) || double.IsNaN(WaterTemperature))
+            {
+                // If we don't have the necessary temperatures, don't change the current state
+                return;
+            }
             if (WaterTemperature < solarHeatingTemp && WaterTemperature < AirTemperature)
                 isOn = true;
             var isCurrentlyOn = Actuators.Instance.GetActuator(solarActuator);
@@ -76,6 +90,8 @@ public partial class PoolService : ObservableObject
     public double WaterTemperature => GetTemperature(TemperatureSensorType.WaterTemperature);
 
     public double AirTemperature => GetTemperature(TemperatureSensorType.AirTemperature);
+
+    public double SolarAirTemperature => GetTemperature(TemperatureSensorType.SolarAirTemperature);
 
     private double GetTemperature(TemperatureSensorType type)
     {
