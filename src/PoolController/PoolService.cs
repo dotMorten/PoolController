@@ -81,19 +81,19 @@ public partial class PoolService : ObservableObject
     {
         if (Settings.Instance.TempSettings.Temp1Type == type)
         {
-            return Devices.Temperature.Instance.Temperature1 + Settings.Instance.TempSettings.Temp1Offset;
+            return Devices.Temperature.Instance.Temperature1;
         }
         else if (Settings.Instance.TempSettings.Temp2Type == type)
         {
-            return Devices.Temperature.Instance.Temperature2 + Settings.Instance.TempSettings.Temp2Offset;
+            return Devices.Temperature.Instance.Temperature2;
         }
         else if (Settings.Instance.TempSettings.Temp3Type == type)
         {
-            return Devices.Temperature.Instance.Temperature3 + Settings.Instance.TempSettings.Temp3Offset;
+            return Devices.Temperature.Instance.Temperature3;
         }
         else if (Settings.Instance.TempSettings.Temp4Type == type)
         {
-            return Devices.Temperature.Instance.Temperature4 + Settings.Instance.TempSettings.Temp4Offset;
+            return Devices.Temperature.Instance.Temperature4;
         }
         return double.NaN;
     }
