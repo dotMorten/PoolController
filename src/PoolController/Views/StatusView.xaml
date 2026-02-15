@@ -37,6 +37,7 @@
                     <StackPanel Spacing="2">
                         <TextBlock Text="Heating" FontSize="16" FontWeight="SemiBold"/>
                     </StackPanel>
+                    <StackPanel Spacing="6">
                     <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Top" HorizontalAlignment="Right">
                         <TextBlock Text="Solar" Opacity="0.75"/>
                         <ToggleButton IsChecked="{x:Bind Service.IsSolarHeating, Mode=OneWay}" >
@@ -51,7 +52,7 @@
                                                         <Setter Target="Off.Visibility" Value="Collapsed" />
                                                     </VisualState.Setters>
                                                 </VisualState>
-                                                <VisualState x:Name="Unchecked">
+                                                <VisualState x:Name="Normal">
                                                     <VisualState.Setters>
                                                         <Setter Target="On.Visibility" Value="Collapsed" />
                                                         <Setter Target="Off.Visibility" Value="Visible" />
@@ -71,6 +72,44 @@
                                 </ControlTemplate>
                             </ToggleButton.Template>
                         </ToggleButton>
+                    </StackPanel>
+
+
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Top" HorizontalAlignment="Right">
+                        <TextBlock Text="Gas" Opacity="0.75"/>
+                        <ToggleButton IsChecked="False" >
+                            <ToggleButton.Template>
+                                <ControlTemplate>
+                                    <Grid>
+                                        <VisualStateManager.VisualStateGroups>
+                                            <VisualStateGroup x:Name="CommonStates">
+                                                <VisualState x:Name="Checked">
+                                                    <VisualState.Setters>
+                                                        <Setter Target="On.Visibility" Value="Visible" />
+                                                        <Setter Target="Off.Visibility" Value="Collapsed" />
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                                <VisualState x:Name="Normal">
+                                                    <VisualState.Setters>
+                                                        <Setter Target="On.Visibility" Value="Collapsed" />
+                                                        <Setter Target="Off.Visibility" Value="Visible" />
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                            </VisualStateGroup>
+                                        </VisualStateManager.VisualStateGroups>
+                                        <StackPanel Orientation="Horizontal" x:Name="On" Spacing="4" Visibility="Collapsed" >
+                                            <TextBlock Text="On" />
+                                            <Ellipse Fill="Green" Width="8" Height="8"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" x:Name="Off" Spacing="4">
+                                            <TextBlock Text="Off" />
+                                            <Ellipse Fill="Red" Width="8" Height="8"/>
+                                        </StackPanel>                                        
+                                    </Grid>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+                    </StackPanel>
                     </StackPanel>
                 </Grid>
                 <TextBlock Text="Heating to 85F" Visibility="{x:Bind Service.IsSolarHeating, Mode=OneWay}" />
