@@ -105,7 +105,23 @@ public partial class Settings : SettingsBase
         set => SetSetting(value);
     }
 
-    public int SolarActuatorId { get; } = 1;
+    public int SolarActuatorId
+    {
+        get => GetSetting(1);
+        set => SetSetting(value);
+    }
+
+    public int VacuumActuatorId
+    {
+        get => GetSetting(2);
+        set => SetSetting(value);
+    }
+
+    public bool VacuumEnabled
+    {
+        get => GetSetting(false);
+        set => SetSetting(value);
+    }
 }
 public enum SolarHeatingMode : int
 {

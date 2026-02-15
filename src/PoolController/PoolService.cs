@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
+using Microsoft.Web.WebView2.Core;
 using Pentair;
 using PoolController.Devices;
 
@@ -17,29 +18,13 @@ public partial class PoolService : ObservableObject
         Settings.Instance.PropertyChanged += OnSettingsChanged;
         Settings.Instance.TempSettings.PropertyChanged += OnTemperatureSettingsChanged;
         Devices.Temperature.Instance.PropertyChanged += Temperature_PropertyChanged;
-        CheckHeatingState();
-    }
 
-    private void Temperature_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == "Temperature" + Settings.Instance.TempSettings.GetTemperatureSensorId(TemperatureSensorType.WaterTemperature))
-        {
-            OnPropertyChanged(nameof(WaterTemperature));
-            CheckHeatingState();
-        }
-        else if (e.PropertyName == "Temperature" + Settings.Instance.TempSettings.GetTemperatureSensorId(TemperatureSensorType.AirTemperature))
-        {
-            OnPropertyChanged(nameof(AirTemperature));
-            CheckHeatingState();
-        }
-        else if (e.PropertyName == "Temperature" + Settings.Instance.TempSettings.GetTemperatureSensorId(TemperatureSensorType.SolarAirTemperature))
-        {
-            CheckHeatingState();
-        }
-        else if (e.PropertyName == nameof(Settings.SolarHeatingMode) || e.PropertyName == nameof(Settings.SolarHeatingTemp))
-        {
-            CheckHeatingState();
-        }
+        CheckHeatingState();
+        // Ensure actuators are in the correct state on startup
+        if (Settings.Instance.SolarActuatorId > 0)
+            Actuators.Instance.SetActuator(Settings.Instance.SolarActuatorId, IsSolarHeating);
+        if (Settings.Instance.VacuumActuatorId > 0)
+            Actuators.Instance.SetActuator(Settings.Instance.VacuumActuatorId, Settings.Instance.VacuumEnabled);
     }
 
     /// <summary>
@@ -95,7 +80,9 @@ public partial class PoolService : ObservableObject
             if (_isSolarHeating != value)
             {
                 _isSolarHeating = value;
-                Actuators.Instance.SetActuator(Settings.Instance.SolarActuatorId, value);
+                if (Settings.Instance.SolarActuatorId > 0)
+                    Actuators.Instance.SetActuator(Settings.Instance.SolarActuatorId, value);
+                Log.LogMessage($"Turning {(value ? "on" : "off")} solar heating.");
                 OnPropertyChanged();
             }
         }
@@ -156,6 +143,36 @@ public partial class PoolService : ObservableObject
         else if (e.PropertyName?.StartsWith("Solar") == true)
         {
             CheckHeatingState();
+        }
+    }
+
+    private void Temperature_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == "Temperature" + Settings.Instance.TempSettings.GetTemperatureSensorId(TemperatureSensorType.WaterTemperature))
+        {
+            OnPropertyChanged(nameof(WaterTemperature));
+            CheckHeatingState();
+        }
+        else if (e.PropertyName == "Temperature" + Settings.Instance.TempSettings.GetTemperatureSensorId(TemperatureSensorType.AirTemperature))
+        {
+            OnPropertyChanged(nameof(AirTemperature));
+            CheckHeatingState();
+        }
+        else if (e.PropertyName == "Temperature" + Settings.Instance.TempSettings.GetTemperatureSensorId(TemperatureSensorType.SolarAirTemperature))
+        {
+            CheckHeatingState();
+        }
+        else if (e.PropertyName == nameof(Settings.SolarHeatingMode) || e.PropertyName == nameof(Settings.SolarHeatingTemp))
+        {
+            CheckHeatingState();
+        }
+        else if (e.PropertyName == nameof(Settings.VacuumEnabled))
+        {
+            if (Settings.Instance.VacuumActuatorId > 0)
+            {
+                Actuators.Instance.SetActuator(Settings.Instance.VacuumActuatorId, Settings.Instance.VacuumEnabled);
+            }
+            Log.LogMessage($"Turning {(Settings.Instance.VacuumEnabled ? "on" : "off")} vacuum.");
         }
     }
 

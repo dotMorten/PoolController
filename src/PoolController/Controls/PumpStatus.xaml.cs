@@ -23,8 +23,8 @@ public sealed partial class PumpStatus : UserControl
     {
         this.InitializeComponent();
         // TODO: Read state from service
-        VacuumButton.IsChecked = true;
-        SkimmerButton.IsChecked = false;
+        VacuumButton.IsChecked = Settings.Instance.VacuumEnabled;
+        SkimmerButton.IsChecked = !Settings.Instance.VacuumEnabled;
     }
 
     public PoolService Service => PoolService.Instance;
@@ -49,12 +49,14 @@ public sealed partial class PumpStatus : UserControl
 
     private void SkimmerClick(object sender, RoutedEventArgs e)
     {
+        Settings.Instance.VacuumEnabled = false;
         SkimmerButton.IsChecked = true;
         VacuumButton.IsChecked = false;
     }
 
     private void VacuumClick(object sender, RoutedEventArgs e)
     {
+        Settings.Instance.VacuumEnabled = true;
         SkimmerButton.IsChecked = false;
         VacuumButton.IsChecked = true;
     }
