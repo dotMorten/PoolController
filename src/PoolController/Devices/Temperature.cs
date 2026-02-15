@@ -142,11 +142,26 @@ public class Temperature : INotifyPropertyChanged
 
     public static Temperature Instance { get; } = new Temperature();
 
+    // Constants for thermistor calculation
+    private const double SupplyVoltageMv = 5100.0; // millivolts
+    private const double FixedResistorOhms = 10000.0; // ohms
+    private const double ReferenceResistanceOhms = 10000.0; // ohms
+    private const double BetaCoefficient = 3950.0; // beta value
+    private const double ReferenceTemperatureC = 25.0; // Celsius
+
     private double ReadTemperatureF(InputMultiplexer input)
     {
         ElectricPotential voltage = ReadVoltage(input);
-        double resistance = (5000 - voltage.Millivolts) * 10000 / voltage.Millivolts;
-        double temperatureC = 1 / (Math.Log(resistance / 10000) / 3950 + 1 / (25 + 273.15)) - 273.15;
+        double measuredVoltageMv = voltage.Millivolts;
+
+        // Calculate thermistor resistance using voltage divider formula
+        double resistance = (SupplyVoltageMv - measuredVoltageMv) * FixedResistorOhms / measuredVoltageMv;
+
+        // Convert resistance to temperature in Celsius using Steinhart-Hart equation
+        double referenceTempK = ReferenceTemperatureC + 273.15;
+        double temperatureC = 1 / (Math.Log(resistance / ReferenceResistanceOhms) / BetaCoefficient + 1 / referenceTempK) - 273.15;
+
+        // Convert Celsius to Fahrenheit
         return temperatureC * 9 / 5 + 32;
     }
 
