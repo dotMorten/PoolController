@@ -5,43 +5,54 @@
     xmlns:local="using:PoolController.Views.Settings"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:controls="using:PoolController.Controls"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
 
     <StackPanel Spacing="12">
         <TextBlock Text="Temperature Sensors" FontWeight="DemiBold" />
-        <Grid RowSpacing="12" ColumnSpacing="6" ColumnDefinitions="*,125" RowDefinitions="Auto,Auto,Auto,Auto">
+        <Grid RowSpacing="12" ColumnSpacing="6" ColumnDefinitions="125,*,135,50" RowDefinitions="Auto,Auto,Auto,Auto">
 
-            <ComboBox Header="Sensor 1" SelectedIndex="0" Style="{StaticResource ComboBoxHeaderLeft}">
+            <TextBlock Text="Sensor 1" Grid.Row="0" VerticalAlignment="Center" />
+            <TextBlock Text="Sensor 2" Grid.Row="1" VerticalAlignment="Center" />
+            <TextBlock Text="Sensor 3" Grid.Row="2" VerticalAlignment="Center" />
+            <TextBlock Text="Sensor 4" Grid.Row="3" VerticalAlignment="Center" />
+
+            <TextBlock Text="{x:Bind Sensors.Temperature1.ToString('0.0°F'), Mode=OneWay}" Grid.Row="0" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="16" />
+            <TextBlock Text="{x:Bind Sensors.Temperature2.ToString('0.0°F'), Mode=OneWay}" Grid.Row="1" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="16" />
+            <TextBlock Text="{x:Bind Sensors.Temperature3.ToString('0.0°F'), Mode=OneWay}" Grid.Row="2" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="16" />
+            <TextBlock Text="{x:Bind Sensors.Temperature4.ToString('0.0°F'), Mode=OneWay}" Grid.Row="3" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="16" />
+
+            <ComboBox SelectedIndex="0" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch">
                 <ComboBoxItem>Pool</ComboBoxItem>
                 <ComboBoxItem>Pool Return</ComboBoxItem>
                 <ComboBoxItem>Air</ComboBoxItem>
                 <ComboBoxItem>Disabled</ComboBoxItem>
             </ComboBox>
-            <NumberBox SpinButtonPlacementMode="Inline" Value="{x:Bind Settings.Temp1Offset, Mode=TwoWay}" SmallChange=".1" Minimum="-50" Maximum="50" Grid.Column="1" />
-            <ComboBox Header="Sensor 2" SelectedIndex="1" Style="{StaticResource ComboBoxHeaderLeft}" Grid.Row="1">
+            <controls:OffsetControl Offset="{x:Bind Settings.Temp1Offset, Mode=TwoWay}" Grid.Column="2" Grid.Row="0" />
+
+            <ComboBox SelectedIndex="0" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch">
                 <ComboBoxItem>Pool</ComboBoxItem>
                 <ComboBoxItem>Pool Return</ComboBoxItem>
                 <ComboBoxItem>Air</ComboBoxItem>
                 <ComboBoxItem>Disabled</ComboBoxItem>
             </ComboBox>
-            <NumberBox SpinButtonPlacementMode="Inline" Value="{x:Bind Settings.Temp2Offset, Mode=TwoWay}" SmallChange=".1" Minimum="-50" Maximum="50" Grid.Column="1" Grid.Row="1"/>
-            <ComboBox Header="Sensor 3" SelectedIndex="3" Style="{StaticResource ComboBoxHeaderLeft}" Grid.Row="2">
+            <controls:OffsetControl Offset="{x:Bind Settings.Temp2Offset, Mode=TwoWay}" Grid.Column="2" Grid.Row="1" />
+            <ComboBox SelectedIndex="0" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch">
                 <ComboBoxItem>Pool</ComboBoxItem>
                 <ComboBoxItem>Pool Return</ComboBoxItem>
                 <ComboBoxItem>Air</ComboBoxItem>
                 <ComboBoxItem>Disabled</ComboBoxItem>
             </ComboBox>
-            <NumberBox SpinButtonPlacementMode="Inline" Value="{x:Bind Settings.Temp3Offset, Mode=TwoWay}" SmallChange=".1" Minimum="-50" Maximum="50" Grid.Column="1" Grid.Row="2"/>
-            <ComboBox Header="Sensor 4" SelectedIndex="4" Style="{StaticResource ComboBoxHeaderLeft}"  Grid.Row="3">
+            <controls:OffsetControl Offset="{x:Bind Settings.Temp3Offset, Mode=TwoWay}" Grid.Column="2" Grid.Row="2" />
+            <ComboBox SelectedIndex="0" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch">
                 <ComboBoxItem>Pool</ComboBoxItem>
                 <ComboBoxItem>Pool Return</ComboBoxItem>
                 <ComboBoxItem>Air</ComboBoxItem>
                 <ComboBoxItem>Disabled</ComboBoxItem>
             </ComboBox>
-            <NumberBox SpinButtonPlacementMode="Inline" Value="{x:Bind Settings.Temp4Offset, Mode=TwoWay}" SmallChange=".1" Minimum="-50" Maximum="50" Grid.Column="1" Grid.Row="3"/>
+            <controls:OffsetControl Offset="{x:Bind Settings.Temp4Offset, Mode=TwoWay}" Grid.Column="2" Grid.Row="3" />
         </Grid>
 
     </StackPanel>

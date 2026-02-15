@@ -23,4 +23,6 @@ public sealed partial class SensorSettings : UserControl
     }
 
     public PoolController.TempSensorSettings Settings => PoolController.Settings.Instance.TempSettings;
+
+    public Devices.Temperature Sensors => Devices.Temperature.Instance;
 }
