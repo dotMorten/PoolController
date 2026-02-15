@@ -48,19 +48,26 @@ public partial class PoolService : ObservableObject
             }
             if (!double.IsNaN(airTemp) && !double.IsNaN(WaterTemperature)) // If we don't have the necessary temperatures, don't change the current state
             {
-                if (WaterTemperature < solarHeatingTemp && WaterTemperature < airTemp)
-                    isOn = true;
-                if (isOn != IsSolarHeating)
+                if(airTemp < WaterTemperature - 1) // If the air temp is significantly lower than the water temp, don't turn on solar heating to avoid cooling the pool
                 {
-                    // Ensure that we are past a threshold of a full degree before flipping back to reduce frequent cycling from
-                    // noise in the sensors
-                    if (IsSolarHeating && WaterTemperature > solarHeatingTemp + 1)
-                    {
-                        isOn = false;
-                    }
-                    else if (!IsSolarHeating && WaterTemperature < solarHeatingTemp - 1 && WaterTemperature < airTemp - 1)
-                    {
+                    isOn = false;
+                }
+                else
+                {
+                    if (WaterTemperature < solarHeatingTemp && WaterTemperature < airTemp)
                         isOn = true;
+                    if (isOn != IsSolarHeating)
+                    {
+                        // Ensure that we are past a threshold of a full degree before flipping back to reduce frequent cycling from
+                        // noise in the sensors
+                        if (IsSolarHeating && WaterTemperature > solarHeatingTemp + 1)
+                        {
+                            isOn = false;
+                        }
+                        else if (!IsSolarHeating && WaterTemperature < solarHeatingTemp - 1 && WaterTemperature < airTemp - 1)
+                        {
+                            isOn = true;
+                        }
                     }
                 }
             }
