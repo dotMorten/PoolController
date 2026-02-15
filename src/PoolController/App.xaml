@@ -245,7 +245,7 @@
                                                   Margin="{ThemeResource ComboBoxTopHeaderMargin}" TextWrapping="Wrap" VerticalAlignment="Center"
                                                   Visibility="Collapsed" x:DeferLoadStrategy="Lazy" />
 
-                                <Grid Grid.Column="1" HorizontalAlignment="Right" MinWidth="200" VerticalAlignment="Center">
+                                <Grid Grid.Column="1" HorizontalAlignment="Right" MinWidth="150" VerticalAlignment="Center">
 
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />

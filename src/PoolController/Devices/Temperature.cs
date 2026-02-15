@@ -12,7 +12,7 @@ public class Temperature : INotifyPropertyChanged
     private readonly Queue<double> samples2 = new Queue<double>();
     private readonly Queue<double> samples3 = new Queue<double>();
     private readonly Queue<double> samples4 = new Queue<double>();
-    private readonly Ads1115 adc;
+    private readonly Ads1115? adc;
 
     private Temperature()
     {
@@ -128,7 +128,7 @@ public class Temperature : INotifyPropertyChanged
 
     private ElectricPotential ReadVoltage(InputMultiplexer input)
     {
-        ElectricPotential voltage = adc.ReadVoltage(input);
+        ElectricPotential voltage = adc?.ReadVoltage(input) ?? new ElectricPotential(double.NaN, UnitsNet.Units.ElectricPotentialUnit.Millivolt);
         return voltage;
     }
 }

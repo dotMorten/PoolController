@@ -12,10 +12,12 @@ internal class Actuators
     const int actuator3Pin = 8;
     const int actuator4Pin = 25;
 
-    private readonly GpioController controller;
+    private readonly GpioController? controller;
 
     private Actuators()
     {
+        if (!System.OperatingSystem.IsLinux())
+            return;
         controller = new GpioController();
         controller.SetPinMode(actuator1Pin, PinMode.Output);
         controller.SetPinMode(actuator2Pin, PinMode.Output);
@@ -49,25 +51,25 @@ internal class Actuators
 
     public bool Actuator1
     {
-        get => controller.Read(actuator1Pin) == PinValue.High;
-        set => controller.Write(actuator1Pin, PinValue.High);
+        get => controller?.Read(actuator1Pin) == PinValue.High;
+        set => controller?.Write(actuator1Pin, PinValue.High);
     }
     
     public bool Actuator2
     {
-        get => controller.Read(actuator2Pin) == PinValue.High;
-        set => controller.Write(actuator2Pin, PinValue.High);
+        get => controller?.Read(actuator2Pin) == PinValue.High;
+        set => controller?.Write(actuator2Pin, PinValue.High);
     }
     
     public bool Actuator3
     {
-        get => controller.Read(actuator3Pin) == PinValue.High;
-        set => controller.Write(actuator3Pin, PinValue.High);
+        get => controller?.Read(actuator3Pin) == PinValue.High;
+        set => controller?.Write(actuator3Pin, PinValue.High);
     }
 
     public bool Actuator4
     {
-        get => controller.Read(actuator4Pin) == PinValue.High;
-        set => controller.Write(actuator4Pin, PinValue.High);
+        get => controller?.Read(actuator4Pin) == PinValue.High;
+        set => controller?.Write(actuator4Pin, PinValue.High);
     }
 }

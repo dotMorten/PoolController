@@ -22,5 +22,5 @@ public sealed partial class SensorSettings : UserControl
         this.InitializeComponent();
     }
 
-    public PoolController.Settings Settings => PoolController.Settings.Instance;
+    public PoolController.TempSensorSettings Settings => PoolController.Settings.Instance.TempSettings;
 }

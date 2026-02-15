@@ -12,29 +12,37 @@
 
     <StackPanel Spacing="12">
         <TextBlock Text="Temperature Sensors" FontWeight="DemiBold" />
-        <ComboBox Header="Sensor 1" SelectedIndex="0" Style="{StaticResource ComboBoxHeaderLeft}">
-            <ComboBoxItem>Pool</ComboBoxItem>
-            <ComboBoxItem>Pool Return</ComboBoxItem>
-            <ComboBoxItem>Air</ComboBoxItem>
-            <ComboBoxItem>Disabled</ComboBoxItem>
-        </ComboBox>
-        <ComboBox Header="Sensor 2" SelectedIndex="1" Style="{StaticResource ComboBoxHeaderLeft}">
-            <ComboBoxItem>Pool</ComboBoxItem>
-            <ComboBoxItem>Pool Return</ComboBoxItem>
-            <ComboBoxItem>Air</ComboBoxItem>
-            <ComboBoxItem>Disabled</ComboBoxItem>
-        </ComboBox>
-        <ComboBox Header="Sensor 3" SelectedIndex="3" Style="{StaticResource ComboBoxHeaderLeft}">
-            <ComboBoxItem>Pool</ComboBoxItem>
-            <ComboBoxItem>Pool Return</ComboBoxItem>
-            <ComboBoxItem>Air</ComboBoxItem>
-            <ComboBoxItem>Disabled</ComboBoxItem>
-        </ComboBox>
-        <ComboBox Header="Sensor 4" SelectedIndex="4" Style="{StaticResource ComboBoxHeaderLeft}">
-            <ComboBoxItem>Pool</ComboBoxItem>
-            <ComboBoxItem>Pool Return</ComboBoxItem>
-            <ComboBoxItem>Air</ComboBoxItem>
-            <ComboBoxItem>Disabled</ComboBoxItem>
-        </ComboBox>
+        <Grid RowSpacing="12" ColumnSpacing="6" ColumnDefinitions="*,125" RowDefinitions="Auto,Auto,Auto,Auto">
+
+            <ComboBox Header="Sensor 1" SelectedIndex="0" Style="{StaticResource ComboBoxHeaderLeft}">
+                <ComboBoxItem>Pool</ComboBoxItem>
+                <ComboBoxItem>Pool Return</ComboBoxItem>
+                <ComboBoxItem>Air</ComboBoxItem>
+                <ComboBoxItem>Disabled</ComboBoxItem>
+            </ComboBox>
+            <NumberBox SpinButtonPlacementMode="Inline" Value="{x:Bind Settings.Temp1Offset, Mode=TwoWay}" SmallChange=".1" Minimum="-50" Maximum="50" Grid.Column="1" />
+            <ComboBox Header="Sensor 2" SelectedIndex="1" Style="{StaticResource ComboBoxHeaderLeft}" Grid.Row="1">
+                <ComboBoxItem>Pool</ComboBoxItem>
+                <ComboBoxItem>Pool Return</ComboBoxItem>
+                <ComboBoxItem>Air</ComboBoxItem>
+                <ComboBoxItem>Disabled</ComboBoxItem>
+            </ComboBox>
+            <NumberBox SpinButtonPlacementMode="Inline" Value="{x:Bind Settings.Temp2Offset, Mode=TwoWay}" SmallChange=".1" Minimum="-50" Maximum="50" Grid.Column="1" Grid.Row="1"/>
+            <ComboBox Header="Sensor 3" SelectedIndex="3" Style="{StaticResource ComboBoxHeaderLeft}" Grid.Row="2">
+                <ComboBoxItem>Pool</ComboBoxItem>
+                <ComboBoxItem>Pool Return</ComboBoxItem>
+                <ComboBoxItem>Air</ComboBoxItem>
+                <ComboBoxItem>Disabled</ComboBoxItem>
+            </ComboBox>
+            <NumberBox SpinButtonPlacementMode="Inline" Value="{x:Bind Settings.Temp3Offset, Mode=TwoWay}" SmallChange=".1" Minimum="-50" Maximum="50" Grid.Column="1" Grid.Row="2"/>
+            <ComboBox Header="Sensor 4" SelectedIndex="4" Style="{StaticResource ComboBoxHeaderLeft}"  Grid.Row="3">
+                <ComboBoxItem>Pool</ComboBoxItem>
+                <ComboBoxItem>Pool Return</ComboBoxItem>
+                <ComboBoxItem>Air</ComboBoxItem>
+                <ComboBoxItem>Disabled</ComboBoxItem>
+            </ComboBox>
+            <NumberBox SpinButtonPlacementMode="Inline" Value="{x:Bind Settings.Temp4Offset, Mode=TwoWay}" SmallChange=".1" Minimum="-50" Maximum="50" Grid.Column="1" Grid.Row="3"/>
+        </Grid>
+
     </StackPanel>
 </UserControl>

@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
@@ -16,27 +14,25 @@ public partial class PoolService : ObservableObject
     private PoolService()
     {
         Settings.Instance.PropertyChanged += OnSettingsChanged;
+        Settings.Instance.TempSettings.PropertyChanged += OnTemperatureSettingsChanged;
         Devices.Temperature.Instance.PropertyChanged += Temperature_PropertyChanged;
     }
 
     private void Temperature_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == "Temperature" + waterTempId)
+        if (e.PropertyName == "Temperature" + Settings.Instance.TempSettings.GetTemperatureSensorId(TemperatureSensorType.WaterTemperature))
         {
             OnPropertyChanged(nameof(WaterTemperature));
             CheckHeatingState();
         }
-        else if (e.PropertyName == "Temperature" + airTempId)
+        else if (e.PropertyName == "Temperature" + Settings.Instance.TempSettings.GetTemperatureSensorId(TemperatureSensorType.AirTemperature))
         {
             OnPropertyChanged(nameof(AirTemperature));
             CheckHeatingState();
         }
     }
 
-    //TODO: Move these to settings
     private double solarHeatingTemp = 85;
-    private int waterTempId = 1;
-    private int airTempId = 2;
     private int solarActuator = 1;
     private SolarHeatingState solarHeatingState = SolarHeatingState.Auto;
     private enum SolarHeatingState
@@ -77,18 +73,27 @@ public partial class PoolService : ObservableObject
         // TODO: Check gas heater
     }
 
-    public double WaterTemperature => GetTemperature(waterTempId);
+    public double WaterTemperature => GetTemperature(TemperatureSensorType.WaterTemperature);
 
-    public double AirTemperature => GetTemperature(airTempId);
+    public double AirTemperature => GetTemperature(TemperatureSensorType.AirTemperature);
 
-    private double GetTemperature(int sensorId)
+    private double GetTemperature(TemperatureSensorType type)
     {
-        switch (sensorId)
+        if (Settings.Instance.TempSettings.Temp1Type == type)
         {
-            case 1: return Devices.Temperature.Instance.Temperature1;
-            case 2: return Devices.Temperature.Instance.Temperature2;
-            case 3: return Devices.Temperature.Instance.Temperature3;
-            case 4: return Devices.Temperature.Instance.Temperature4;
+            return Devices.Temperature.Instance.Temperature1 + Settings.Instance.TempSettings.Temp1Offset;
+        }
+        else if (Settings.Instance.TempSettings.Temp2Type == type)
+        {
+            return Devices.Temperature.Instance.Temperature2 + Settings.Instance.TempSettings.Temp2Offset;
+        }
+        else if (Settings.Instance.TempSettings.Temp3Type == type)
+        {
+            return Devices.Temperature.Instance.Temperature3 + Settings.Instance.TempSettings.Temp3Offset;
+        }
+        else if (Settings.Instance.TempSettings.Temp4Type == type)
+        {
+            return Devices.Temperature.Instance.Temperature4 + Settings.Instance.TempSettings.Temp4Offset;
         }
         return double.NaN;
     }
@@ -122,6 +127,13 @@ public partial class PoolService : ObservableObject
         {
             CheckHeatingState();
         }
+    }
+
+    private void OnTemperatureSettingsChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(AirTemperature));
+        OnPropertyChanged(nameof(WaterTemperature));
+        CheckHeatingState();
     }
 
     private void StartPentairClient()
@@ -240,79 +252,4 @@ public partial class PoolService : ObservableObject
     public Mqtt.MqttServer? MqttServer { get; private set; }
 
     public Pentair.Client? PentairClient { get; private set; }
-}
-
-public class Settings : ObservableObject
-{
-    private ApplicationDataContainer localSettings;
-    private Settings()
-    {
-        localSettings = ApplicationData.Current.LocalSettings;
-    }
-    public static Settings Instance { get; } = new Settings();
-
-    public T GetSetting<T>(T defaultValue, [CallerMemberName] string? key = null)
-    {
-        if (key is null) throw new ArgumentNullException(nameof(key));
-        if (localSettings.Values.ContainsKey(key))
-        {
-            var v = localSettings.Values[key];
-            if (typeof(T).IsEnum && v is int)
-                return (T)v;
-            if (v is T value)
-                return value;
-        }
-        return defaultValue;
-    }
-
-    public void SetSetting<T>(T value, [CallerMemberName] string? key = null)
-    {
-        if (key is null) throw new ArgumentNullException(nameof(key));
-        if (typeof(T).IsEnum)
-            localSettings.Values[key] = Convert.ChangeType(value, typeof(int));
-        else
-            localSettings.Values[key] = value;
-        OnPropertyChanged(key);
-    }
-
-    private static string GetDefaultPort()
-    {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            return "/dev/serial0";
-        return string.Empty;
-    }
-    public string? PumpComPort
-    {
-        get => GetSetting(GetDefaultPort());
-        set => SetSetting(value ?? string.Empty);
-    }
-
-    public string? ChlorinatorComPort
-    {
-        get => GetSetting(string.Empty);
-        set => SetSetting(value ?? string.Empty);
-    }
-
-
-    public bool EnableMqtt 
-    {
-        get => GetSetting(false);
-        set => SetSetting(value);
-    }
-
-    public string MqttBrokerAddress
-    {
-        get => GetSetting("homeassistant");
-        set => SetSetting(value ?? string.Empty);
-    }
-    public string MqttUsername
-    {
-        get => GetSetting(string.Empty);
-        set => SetSetting(value ?? string.Empty);
-    }
-    public string MqttPassword
-    {
-        get => GetSetting(string.Empty);
-        set => SetSetting(value ?? string.Empty);
-    }
 }
