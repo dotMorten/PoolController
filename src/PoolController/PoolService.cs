@@ -42,10 +42,6 @@ public partial class PoolService : ObservableObject
         else if (solarHeatingState == SolarHeatingMode.Auto)
         {
             var airTemp = SolarAirTemperature;
-            if (double.IsNaN(SolarAirTemperature)) // If we don't have a solar air sensor, fallback to air temp
-            {
-                airTemp = AirTemperature;
-            }
             if (!double.IsNaN(airTemp) && !double.IsNaN(WaterTemperature)) // If we don't have the necessary temperatures, don't change the current state
             {
                 if (airTemp - 1 < WaterTemperature) // If the air temp is isn't warmer than the water, don't turn on solar heating to avoid cooling the pool
@@ -99,7 +95,19 @@ public partial class PoolService : ObservableObject
 
     public double AirTemperature => GetTemperature(TemperatureSensorType.AirTemperature);
 
-    public double SolarAirTemperature => GetTemperature(TemperatureSensorType.SolarAirTemperature);
+    public double SolarAirTemperature
+    {
+        get
+        {
+            var temp = GetTemperature(TemperatureSensorType.SolarAirTemperature);
+            if (double.IsNaN(temp))
+            {
+                // Fall back to air temp
+                temp = GetTemperature(TemperatureSensorType.AirTemperature);
+            }
+            return temp;
+        }
+    }
 
     private double GetTemperature(TemperatureSensorType type)
     {
@@ -178,10 +186,12 @@ public partial class PoolService : ObservableObject
         else if (e.PropertyName == "Temperature" + Settings.Instance.TempSettings.GetTemperatureSensorId(TemperatureSensorType.AirTemperature))
         {
             OnPropertyChanged(nameof(AirTemperature));
+            OnPropertyChanged(nameof(SolarAirTemperature));
             CheckHeatingState();
         }
         else if (e.PropertyName == "Temperature" + Settings.Instance.TempSettings.GetTemperatureSensorId(TemperatureSensorType.SolarAirTemperature))
         {
+            OnPropertyChanged(nameof(SolarAirTemperature));
             CheckHeatingState();
         }
     }
