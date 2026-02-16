@@ -55,6 +55,7 @@ internal static class Devices
               .HasSwitch(config => config.OnModel(model)
                   .WithStatusProperty(nameof(PoolControllerModel.PumpServiceMode))
                   .WithFriendlyName("Pump Service Mode")
+                  .WithCommandMethod(nameof(PoolControllerModel.SetPumpServiceMode))
                   .WithNodeId("pump_service_mode"))
 
               //.HasEnumSensor(config => config.OnModel(model)

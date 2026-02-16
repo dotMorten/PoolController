@@ -132,6 +132,11 @@ public partial class PoolControllerModel : ObservableObject
     [ObservableProperty]
     private bool _pumpServiceMode = false;
 
+    public void SetPumpServiceMode(bool enabled)
+    {
+        PoolService.Instance.IsPumpInServiceMode = enabled;
+    }
+
     public void ToggleOn(bool on)
     {  
         IsOn = on; 
