@@ -109,7 +109,7 @@ public partial class PoolService : ObservableObject
         }
     }
 
-    private double GetTemperature(TemperatureSensorType type)
+    public double GetTemperature(TemperatureSensorType type)
     {
         if (Settings.Instance.TempSettings.Temp1Type == type)
         {

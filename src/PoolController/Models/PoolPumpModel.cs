@@ -1,3 +1,6 @@
+using Iot.Device.Gpio.Drivers;
+using PoolController.Devices;
+
 namespace PoolController.Models;
 
 public partial class PoolControllerModel : ObservableObject
@@ -10,6 +13,40 @@ public partial class PoolControllerModel : ObservableObject
     {
         PoolService.Instance.PropertyChanged += Service_PropertyChanged;
         Settings.Instance.PropertyChanged += Settings_PropertyChanged;
+        Devices.Temperature.Instance.PropertyChanged += Temperature_PropertyChanged;
+    }
+
+    private void Temperature_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        TemperatureSensorType type = TemperatureSensorType.Disabled;
+        var temp = double.NaN;
+        switch (e.PropertyName)
+        {
+            case nameof(Temperature.Temperature1):
+                temp = Temperature.Instance.Temperature1;
+                type = Settings.Instance.TempSettings.Temp1Type;
+                break;
+            case nameof(Temperature.Temperature2):
+                temp = Temperature.Instance.Temperature2;
+                type = Settings.Instance.TempSettings.Temp2Type; break;
+            case nameof(Temperature.Temperature3):
+                temp = Temperature.Instance.Temperature3;
+                type = Settings.Instance.TempSettings.Temp3Type; break;
+            case nameof(Temperature.Temperature4):
+                temp = Temperature.Instance.Temperature4;
+                type = Settings.Instance.TempSettings.Temp4Type; break;
+        }
+        switch (type)
+        {
+            case TemperatureSensorType.AirTemperature:
+                AirTemperature = temp; break;
+            case TemperatureSensorType.SolarAirTemperature:
+                SolarAirTemperature = temp; break;
+            case TemperatureSensorType.WaterTemperature:
+                WaterTemperature = temp; break;
+            case TemperatureSensorType.ReturnTemperature:
+                ReturnWaterTemperature = temp; break;
+        }
     }
 
     private void Settings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -29,12 +66,6 @@ public partial class PoolControllerModel : ObservableObject
     {
         switch (e.PropertyName)
         {
-            case nameof(PoolService.AirTemperature):
-                AirTemperature = PoolService.Instance.AirTemperature; break;
-            case nameof(PoolService.SolarAirTemperature):
-                SolarAirTemperature = PoolService.Instance.SolarAirTemperature; break;
-            case nameof(PoolService.WaterTemperature):
-                WaterTemperature = PoolService.Instance.WaterTemperature; break;
             case nameof(PoolService.IsSolarHeating):
                 IsSolarHeating = PoolService.Instance.IsSolarHeating; break;
             case nameof(PoolService.IsPumpInServiceMode):
