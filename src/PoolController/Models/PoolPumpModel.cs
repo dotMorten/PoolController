@@ -140,9 +140,9 @@ public partial class PoolControllerModel : ObservableObject
     [ObservableProperty]
     private bool _vacuumEnabled = false;
 
-    partial void OnVacuumEnabledChanged(bool value)
+    public void SetVacuumEnabled(bool vacuumEnabled)
     {
-        Settings.Instance.VacuumEnabled = value;
+        Settings.Instance.VacuumEnabled = vacuumEnabled;
     }
 
     #endregion

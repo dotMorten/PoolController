@@ -95,6 +95,7 @@ internal static class Devices
                   .WithUnitOfMeasurement(TemperatureNumberUoM.DegreesFahrenheit))
               .HasSwitch(config => config.OnModel(model)
                   .WithStatusProperty(nameof(PoolControllerModel.VacuumEnabled))
+                  .WithCommandMethod(nameof(PoolControllerModel.SetVacuumEnabled))
                   .WithFriendlyName("Vacuum")
                   .WithNodeId("vacuum"))
 
