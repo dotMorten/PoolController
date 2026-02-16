@@ -15,6 +15,13 @@ public partial class PoolControllerModel : ObservableObject
         Settings.Instance.PropertyChanged += Settings_PropertyChanged;
         Settings.Instance.TempSettings.PropertyChanged += TempSettings_PropertyChanged;
         Temperature.Instance.PropertyChanged += Temperature_PropertyChanged;
+        // Initialize state
+        RefreshTemperatures();
+        SolarHeatingMode = Settings.Instance.SolarHeatingMode; ;
+        SolarTargetTemperature = Settings.Instance.SolarHeatingTemp;
+        VacuumEnabled = Settings.Instance.VacuumEnabled;
+        IsSolarHeating = PoolService.Instance.IsSolarHeating;
+        PumpServiceMode = PoolService.Instance.IsPumpInServiceMode;
     }
 
     private void Temperature_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -63,6 +70,10 @@ public partial class PoolControllerModel : ObservableObject
         }
     }
     private void TempSettings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        RefreshTemperatures();
+    }
+    private void RefreshTemperatures()
     {
         // If settings change, refresh all
         WaterTemperature = PoolService.Instance.GetTemperature(TemperatureSensorType.WaterTemperature);
