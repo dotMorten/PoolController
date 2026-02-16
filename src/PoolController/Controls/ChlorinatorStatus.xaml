@@ -37,7 +37,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="Output" Opacity="0.75"/>
-            <TextBlock Grid.Column="1" Text="{x:Bind Service.ChlorinatorStatus.Percentage.ToString('0\\%'), Mode=OneWay}" Opacity="0.85"/>
+            <TextBlock Grid.Column="1" Text="{x:Bind Service.MqttModel.ChlorinatorPercentage.ToString('0\\%'), Mode=OneWay}" Opacity="0.85"/>
         </Grid>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -45,7 +45,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="Salt Level" Opacity="0.75"/>
-            <TextBlock Grid.Column="1" Text="{x:Bind Service.ChlorinatorStatus.SaltLevel.ToString('0 ppm'), Mode=OneWay}" Opacity="0.85"/>
+            <TextBlock Grid.Column="1" Text="{x:Bind Service.MqttModel.ChlorinatorSaltLevel.ToString('0 ppm'), Mode=OneWay}" Opacity="0.85"/>
         </Grid>
 
         <Grid SizeChanged="Grid_SizeChanged" x:Name="SaltIndicatorGrid">
@@ -66,7 +66,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="Temperature" Opacity="0.75"/>
-            <TextBlock Grid.Column="1" Text="{x:Bind Service.ChlorinatorStatus.Temperature.ToString('0°F'), Mode=OneWay}" Opacity="0.85"/>
+            <TextBlock Grid.Column="1" Text="{x:Bind Service.MqttModel.ChlorinatorTemperature.ToString('0°F'), Mode=OneWay}" Opacity="0.85"/>
         </Grid>
 
 

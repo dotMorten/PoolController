@@ -138,6 +138,7 @@ public partial class PoolService : ObservableObject
 
     private void Init()
     {
+        MqttModel.Init();
         StartMqtt();
         StartPentairClient();
     }
@@ -257,19 +258,10 @@ public partial class PoolService : ObservableObject
             // Handle status message
             if (e.Source == 0x60) // Pump 1
             {
+               MqttModel.UpdatePumpStatus(statusMessage);
                DispatcherQueue?.TryEnqueue(() =>
                {
-                   PumpStatus.Power = statusMessage.Power;
-                   PumpStatus.PumpSpeed = statusMessage.Rpm;
-                   PumpStatus.EstimatedFlow = statusMessage.Gpm;
-                   // PumpStatus.Ppc = statusMessage.Ppc;
-                   // PumpStatus.Error = statusMessage.Error;
-                   PumpStatus.Clock = statusMessage.Clock;
-                   PumpStatus.State = statusMessage.State;
-                   PumpStatus.Running = statusMessage.Run;
-                   PumpStatus.Mode = statusMessage.Mode;
-                   PumpStatus.Timer = statusMessage.Timer;
-                   if(PumpStatus.Clock.Hour != DateTime.Now.Hour || Math.Abs(PumpStatus.Clock.Minute - DateTime.Now.Minute - DateTime.Now.Second / 60d) > 1.5)
+                   if (MqttModel.Clock.Hour != DateTime.Now.Hour || Math.Abs(MqttModel.Clock.Minute - DateTime.Now.Minute - DateTime.Now.Second / 60d) > 1.5)
                    {
                        // Clock is off, update it
                        _ = PentairClient?.SetPumpClock(Pentair.Client.Pump1, (byte)DateTime.Now.Hour, (byte)DateTime.Now.Minute);
@@ -292,9 +284,8 @@ public partial class PoolService : ObservableObject
         }
     }
 
-    public Models.PoolPumpModel PumpStatus { get; } = new Models.PoolPumpModel();
+    public Models.PoolControllerModel MqttModel { get; } = new Models.PoolControllerModel();
 
-    public Models.ChlorinatorModel ChlorinatorStatus { get; } = new Models.ChlorinatorModel();
 
     private async void StartMqtt()
     {

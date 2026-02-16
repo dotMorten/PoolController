@@ -27,10 +27,10 @@
 
                 <StackPanel Spacing="2">
                     <TextBlock Text="Pump" FontSize="16" FontWeight="SemiBold"/>
-                    <TextBlock Text="{x:Bind Service.PumpStatus.Mode, Mode=OneWay}" Opacity="0.75"/>
+                    <TextBlock Text="{x:Bind Service.MqttModel.Mode, Mode=OneWay}" Opacity="0.75"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Top" HorizontalAlignment="Right">
-                    <TextBlock Text="{x:Bind Service.PumpStatus.State, Mode=OneWay}" Opacity="0.75"/>
+                    <TextBlock Text="{x:Bind Service.MqttModel.State, Mode=OneWay}" Opacity="0.75"/>
                     <Ellipse Width="8" Height="8" Fill="Green"/>
                 </StackPanel>
 
@@ -49,19 +49,19 @@
                 <!-- Semi-ring gauge (see section 2 for how it works) -->
                 <Grid Width="190" Height="100">
                     <local:SemiRingGauge
-                                Value="{x:Bind Service.PumpStatus.PumpSpeed, Mode=OneWay}"
+                                Value="{x:Bind Service.MqttModel.PumpSpeed, Mode=OneWay}"
                                 StrokeThickness="10"
                                 TrackBrush="#2B313A"
                                 ValueBrush="#4CC2FF"/>
                     <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center">
                         <TextBlock Text="RPM" Opacity="0.75" FontSize="13" HorizontalAlignment="Center"/>
-                        <TextBlock Text="{x:Bind Service.PumpStatus.PumpSpeed, Mode=OneWay}" FontSize="38" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{x:Bind Service.MqttModel.PumpSpeed, Mode=OneWay}" FontSize="38" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
 
-                <TextBlock Grid.Row="1" Text="{x:Bind Service.PumpStatus.Running, Mode=OneWay}" HorizontalAlignment="Center" Opacity="0.65" FontSize="12"/>
+                <TextBlock Grid.Row="1" Text="{x:Bind Service.MqttModel.Running, Mode=OneWay}" HorizontalAlignment="Center" Opacity="0.65" FontSize="12"/>
             </Grid>
-            <TextBlock Text="{x:Bind Service.PumpStatus.Timer, Mode=OneWay}" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Opacity="0.65" FontSize="12"/> "
+            <TextBlock Text="{x:Bind Service.MqttModel.Timer, Mode=OneWay}" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Opacity="0.65" FontSize="12"/> "
 
             <!-- Watts secondary -->
             <Grid Grid.Row="2" RowSpacing="6">
@@ -77,7 +77,7 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Text="Power Usage" Opacity="0.75"/>
-                    <TextBlock Grid.Column="1" Text="{x:Bind Service.PumpStatus.Power.ToString('0W'), Mode=OneWay}" Opacity="0.85"/>
+                    <TextBlock Grid.Column="1" Text="{x:Bind Service.MqttModel.Power.ToString('0W'), Mode=OneWay}" Opacity="0.85"/>
                 </Grid>
 
                 <ProgressBar
@@ -86,7 +86,7 @@
                     CornerRadius="4"
                     Minimum="0"
                     Maximum="2500"
-                    Value="{x:Bind Service.PumpStatus.Power, Mode=OneWay}" 
+                    Value="{x:Bind Service.MqttModel.Power, Mode=OneWay}" 
                             Background="#2B313A"
                     Foreground="#F2B705"/>
             </Grid>
