@@ -13,7 +13,8 @@ public partial class PoolControllerModel : ObservableObject
     {
         PoolService.Instance.PropertyChanged += Service_PropertyChanged;
         Settings.Instance.PropertyChanged += Settings_PropertyChanged;
-        Devices.Temperature.Instance.PropertyChanged += Temperature_PropertyChanged;
+        Settings.Instance.TempSettings.PropertyChanged += TempSettings_PropertyChanged;
+        Temperature.Instance.PropertyChanged += Temperature_PropertyChanged;
     }
 
     private void Temperature_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -60,6 +61,18 @@ public partial class PoolControllerModel : ObservableObject
             case nameof(Settings.VacuumEnabled):
                 VacuumEnabled = Settings.Instance.VacuumEnabled; break;
         }
+    }
+    private void TempSettings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        // If settings change, refresh all
+        WaterTemperature = PoolService.Instance.GetTemperature(TemperatureSensorType.WaterTemperature);
+        ReturnWaterTemperature = PoolService.Instance.GetTemperature(TemperatureSensorType.ReturnTemperature);
+        AirTemperature= PoolService.Instance.GetTemperature(TemperatureSensorType.AirTemperature);
+        SolarAirTemperature = PoolService.Instance.GetTemperature(TemperatureSensorType.SolarAirTemperature);
+        // Aux1Temperature = PoolService.Instance.GetTemperature(TemperatureSensorType.Aux1);
+        // Aux2Temperature = PoolService.Instance.GetTemperature(TemperatureSensorType.Aux2);
+        // Aux3Temperature = PoolService.Instance.GetTemperature(TemperatureSensorType.Aux3);
+        // Aux4Temperature = PoolService.Instance.GetTemperature(TemperatureSensorType.Aux4);
     }
 
     private void Service_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
