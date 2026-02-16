@@ -299,8 +299,9 @@ public partial class PoolService : ObservableObject
         {
             MqttServer = await PoolController.Mqtt.MqttServer.StartServer(Settings.Instance.MqttBrokerAddress, Settings.Instance.MqttUsername, Settings.Instance.MqttPassword);
         }
-        catch
+        catch(System.Exception ex)
         {
+            Log.LogError("Failed to start MQTT Server: " + ex.Message);
             Settings.Instance.EnableMqtt = false;
         }
     }

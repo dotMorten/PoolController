@@ -123,6 +123,8 @@ public partial class PoolControllerModel : ObservableObject
     [ObservableProperty]
     private double _solarTargetTemperature = double.NaN;
 
+    public void SetSolarTargetTemperature(double temp) => SolarTargetTemperature = temp;
+
     [ObservableProperty]
     private SolarHeatingMode _solarHeatingMode = SolarHeatingMode.Off;
 

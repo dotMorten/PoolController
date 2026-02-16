@@ -85,6 +85,7 @@ internal static class Devices
                   .WithStatusProperty(nameof(PoolControllerModel.SolarTargetTemperature))
                   .WithFriendlyName("Solar Target Temperature")
                   .WithNodeId("solar_target_temperature")
+                  .WithCommandMethod(nameof(PoolControllerModel.SetSolarTargetTemperature))
                   .WithUnitOfMeasurement(TemperatureNumberUoM.DegreesFahrenheit))
               .HasSwitch(config => config.OnModel(model)
                   .WithStatusProperty(nameof(PoolControllerModel.VacuumEnabled))
