@@ -25,17 +25,17 @@ public class MqttServer
         mqttBrokerSection["Address"] = address;
         mqttBrokerSection["Username"] = username;
         mqttBrokerSection["Password"] = password;
-        var poolModel = PoolService.Instance.PumpStatus;
-        var chlorinatorModel = PoolService.Instance.ChlorinatorStatus;
+        var poolModel = PoolService.Instance.MqttModel;
+        //var chlorinatorModel = PoolService.Instance.ChlorinatorStatus;
 
-        var device1 = Devices.BuildPump(poolModel, "Pump1");
-        var device2 = Devices.BuildChlorinator(chlorinatorModel);
+        var device1 = Devices.BuildPump(poolModel, "pool_controller");
+        //var device2 = Devices.BuildChlorinator(chlorinatorModel);
 
         var mqttClientOptions = HassMqttClientFactory.CreateQuickStartOptions("pool_controller", appConfig);
         var bridge = new BridgeConfiguration()
                      .WithMqttOptions(mqttClientOptions)
                      .HasDevice(device1)
-                     .HasDevice(device2)
+                     //.HasDevice(device2)
                      .Build();
 
         // Start the bridge

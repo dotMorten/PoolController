@@ -39,11 +39,14 @@ public class SettingsBase : INotifyPropertyChanged
     public void SetSetting<T>(T value, [CallerMemberName] string? propertyName = null)
     {
         if (propertyName is null) throw new ArgumentNullException(nameof(propertyName));
+        var oldValue = GetSetting<T>(default(T)!, propertyName);
         if (typeof(T).IsEnum)
             localSettings.Values[keyPrefix + propertyName] = Convert.ChangeType(value, typeof(int));
         else
             localSettings.Values[keyPrefix + propertyName] = value;
-        OnPropertyChanged(propertyName);
+
+        if (value is not null && !value.Equals(oldValue) || value is null && oldValue is not null)
+            OnPropertyChanged(propertyName);
     }
 }
 

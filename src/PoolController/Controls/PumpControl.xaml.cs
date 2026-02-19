@@ -28,17 +28,17 @@ public sealed partial class PumpControl : UserControl
         program1Button.IsEnabled = stopButton.IsEnabled = !Service.IsPumpInServiceMode;
         this.Loaded += (s, e) =>
         {
-            Service.PumpStatus.PropertyChanged += OnPumpPropertyChanged;
+            Service.MqttModel.PropertyChanged += OnPumpPropertyChanged;
         };
         this.Unloaded += (s, e) =>
         {
-            Service.PumpStatus.PropertyChanged -= OnPumpPropertyChanged;
+            Service.MqttModel.PropertyChanged -= OnPumpPropertyChanged;
         };
     }
 
     private void OnPumpPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(Service.PumpStatus.Running))
+        if (e.PropertyName == nameof(Service.MqttModel.Running))
         {
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
             {
@@ -61,7 +61,7 @@ public sealed partial class PumpControl : UserControl
         if (Service.PentairClient is null)
             return;
         try {
-            if (Service.PumpStatus.Running == Pentair.PumpRunning.Stopped)
+            if (Service.MqttModel.Running == Pentair.PumpRunning.Stopped)
             {
                 stopButton.Content = "Starting...";
                 await Service.PentairClient.Start(Pentair.Client.Pump1);
@@ -83,7 +83,7 @@ public sealed partial class PumpControl : UserControl
 
     private void UpdateStopButton()
     {
-        stopButton.Content = Service.PumpStatus.Running == Pentair.PumpRunning.Stopped ? "Start" : "Stop";
+        stopButton.Content = Service.MqttModel.Running == Pentair.PumpRunning.Stopped ? "Start" : "Stop";
     }
 
     private async void program1Button_Click(object sender, RoutedEventArgs e)

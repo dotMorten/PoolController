@@ -1,0 +1,103 @@
+﻿<UserControl
+    x:Class="PoolController.Controls.HeatStatus"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PoolController.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="320"
+    d:DesignWidth="400" >
+
+    <Grid RowSpacing="6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Spacing="2">
+            <TextBlock Text="Heating" FontSize="16" FontWeight="SemiBold"/>
+        </StackPanel>
+
+        <StackPanel Spacing="6" Grid.Column="1" Grid.RowSpan="2" VerticalAlignment="Top" HorizontalAlignment="Right">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Top" HorizontalAlignment="Right">
+                <TextBlock Text="Solar" Opacity="0.75"/>
+                <ToggleButton IsChecked="{x:Bind Service.IsSolarHeating, Mode=OneWay}" >
+                    <ToggleButton.Template>
+                        <ControlTemplate>
+                            <Grid>
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Checked">
+                                            <VisualState.Setters>
+                                                <Setter Target="On.Visibility" Value="Visible" />
+                                                <Setter Target="Off.Visibility" Value="Collapsed" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Normal">
+                                            <VisualState.Setters>
+                                                <Setter Target="On.Visibility" Value="Collapsed" />
+                                                <Setter Target="Off.Visibility" Value="Visible" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <StackPanel Orientation="Horizontal" x:Name="On" Spacing="4" Visibility="Collapsed" >
+                                    <TextBlock Text="On" />
+                                    <Ellipse Fill="Green" Width="8" Height="8"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" x:Name="Off" Spacing="4">
+                                    <TextBlock Text="Off" />
+                                    <Ellipse Fill="Red" Width="8" Height="8"/>
+                                </StackPanel>                                        
+                            </Grid>
+                        </ControlTemplate>
+                    </ToggleButton.Template>
+                </ToggleButton>
+            </StackPanel>
+
+
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Top" HorizontalAlignment="Right">
+                <TextBlock Text="Gas" Opacity="0.75"/>
+                <ToggleButton IsChecked="False" >
+                    <ToggleButton.Template>
+                        <ControlTemplate>
+                            <Grid>
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Checked">
+                                            <VisualState.Setters>
+                                                <Setter Target="On.Visibility" Value="Visible" />
+                                                <Setter Target="Off.Visibility" Value="Collapsed" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Normal">
+                                            <VisualState.Setters>
+                                                <Setter Target="On.Visibility" Value="Collapsed" />
+                                                <Setter Target="Off.Visibility" Value="Visible" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <StackPanel Orientation="Horizontal" x:Name="On" Spacing="4" Visibility="Collapsed" >
+                                    <TextBlock Text="On" />
+                                    <Ellipse Fill="Green" Width="8" Height="8"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" x:Name="Off" Spacing="4">
+                                    <TextBlock Text="Off" />
+                                    <Ellipse Fill="Red" Width="8" Height="8"/>
+                                </StackPanel>                                        
+                            </Grid>
+                        </ControlTemplate>
+                    </ToggleButton.Template>
+                </ToggleButton>
+            </StackPanel>
+        </StackPanel>
+        
+        <TextBlock x:Name="StatusText" Text="{x:Bind Settings.SolarHeatingTemp.ToString('Heating to 0°F')}" TextWrapping="Wrap" Grid.Row="1" />
+    </Grid>
+</UserControl>

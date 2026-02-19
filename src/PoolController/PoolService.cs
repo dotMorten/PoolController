@@ -42,10 +42,6 @@ public partial class PoolService : ObservableObject
         else if (solarHeatingState == SolarHeatingMode.Auto)
         {
             var airTemp = SolarAirTemperature;
-            if (double.IsNaN(SolarAirTemperature)) // If we don't have a solar air sensor, fallback to air temp
-            {
-                airTemp = AirTemperature;
-            }
             if (!double.IsNaN(airTemp) && !double.IsNaN(WaterTemperature)) // If we don't have the necessary temperatures, don't change the current state
             {
                 if (airTemp - 1 < WaterTemperature) // If the air temp is isn't warmer than the water, don't turn on solar heating to avoid cooling the pool
@@ -99,9 +95,21 @@ public partial class PoolService : ObservableObject
 
     public double AirTemperature => GetTemperature(TemperatureSensorType.AirTemperature);
 
-    public double SolarAirTemperature => GetTemperature(TemperatureSensorType.SolarAirTemperature);
+    public double SolarAirTemperature
+    {
+        get
+        {
+            var temp = GetTemperature(TemperatureSensorType.SolarAirTemperature);
+            if (double.IsNaN(temp))
+            {
+                // Fall back to air temp
+                temp = GetTemperature(TemperatureSensorType.AirTemperature);
+            }
+            return temp;
+        }
+    }
 
-    private double GetTemperature(TemperatureSensorType type)
+    public double GetTemperature(TemperatureSensorType type)
     {
         if (Settings.Instance.TempSettings.Temp1Type == type)
         {
@@ -130,6 +138,7 @@ public partial class PoolService : ObservableObject
 
     private void Init()
     {
+        MqttModel.Init();
         StartMqtt();
         StartPentairClient();
     }
@@ -178,10 +187,12 @@ public partial class PoolService : ObservableObject
         else if (e.PropertyName == "Temperature" + Settings.Instance.TempSettings.GetTemperatureSensorId(TemperatureSensorType.AirTemperature))
         {
             OnPropertyChanged(nameof(AirTemperature));
+            OnPropertyChanged(nameof(SolarAirTemperature));
             CheckHeatingState();
         }
         else if (e.PropertyName == "Temperature" + Settings.Instance.TempSettings.GetTemperatureSensorId(TemperatureSensorType.SolarAirTemperature))
         {
+            OnPropertyChanged(nameof(SolarAirTemperature));
             CheckHeatingState();
         }
     }
@@ -247,19 +258,10 @@ public partial class PoolService : ObservableObject
             // Handle status message
             if (e.Source == 0x60) // Pump 1
             {
+               MqttModel.UpdatePumpStatus(statusMessage);
                DispatcherQueue?.TryEnqueue(() =>
                {
-                   PumpStatus.Power = statusMessage.Power;
-                   PumpStatus.PumpSpeed = statusMessage.Rpm;
-                   PumpStatus.EstimatedFlow = statusMessage.Gpm;
-                   // PumpStatus.Ppc = statusMessage.Ppc;
-                   // PumpStatus.Error = statusMessage.Error;
-                   PumpStatus.Clock = statusMessage.Clock;
-                   PumpStatus.State = statusMessage.State;
-                   PumpStatus.Running = statusMessage.Run;
-                   PumpStatus.Mode = statusMessage.Mode;
-                   PumpStatus.Timer = statusMessage.Timer;
-                   if(PumpStatus.Clock.Hour != DateTime.Now.Hour || Math.Abs(PumpStatus.Clock.Minute - DateTime.Now.Minute - DateTime.Now.Second / 60d) > 1.5)
+                   if (MqttModel.Clock.Hour != DateTime.Now.Hour || Math.Abs(MqttModel.Clock.Minute - DateTime.Now.Minute - DateTime.Now.Second / 60d) > 1.5)
                    {
                        // Clock is off, update it
                        _ = PentairClient?.SetPumpClock(Pentair.Client.Pump1, (byte)DateTime.Now.Hour, (byte)DateTime.Now.Minute);
@@ -282,9 +284,8 @@ public partial class PoolService : ObservableObject
         }
     }
 
-    public Models.PoolPumpModel PumpStatus { get; } = new Models.PoolPumpModel();
+    public Models.PoolControllerModel MqttModel { get; } = new Models.PoolControllerModel();
 
-    public Models.ChlorinatorModel ChlorinatorStatus { get; } = new Models.ChlorinatorModel();
 
     private async void StartMqtt()
     {
@@ -298,8 +299,9 @@ public partial class PoolService : ObservableObject
         {
             MqttServer = await PoolController.Mqtt.MqttServer.StartServer(Settings.Instance.MqttBrokerAddress, Settings.Instance.MqttUsername, Settings.Instance.MqttPassword);
         }
-        catch
+        catch(System.Exception ex)
         {
+            Log.LogError("Failed to start MQTT Server: " + ex.Message);
             Settings.Instance.EnableMqtt = false;
         }
     }

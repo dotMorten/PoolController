@@ -22,7 +22,20 @@ public sealed partial class PumpStatus : UserControl
     public PumpStatus()
     {
         this.InitializeComponent();
-        // TODO: Read state from service
+        Settings.Instance.PropertyChanged += Instance_PropertyChanged;
+        UpdateVacuumButtons();
+    }
+
+    private void Instance_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Settings.VacuumEnabled))
+        {
+            DispatcherQueue.TryEnqueue(UpdateVacuumButtons);
+        }
+    }
+
+    private void UpdateVacuumButtons()
+    {
         VacuumButton.IsChecked = Settings.Instance.VacuumEnabled;
         SkimmerButton.IsChecked = !Settings.Instance.VacuumEnabled;
     }

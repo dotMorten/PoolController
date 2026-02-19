@@ -28,18 +28,18 @@ public sealed partial class ChlorinatorStatus : UserControl
 
     private void ChlorinatorStatus_Unloaded(object sender, RoutedEventArgs e)
     {
-        Service.ChlorinatorStatus.PropertyChanged -= Service_PropertyChanged;
+        Service.MqttModel.PropertyChanged -= Service_PropertyChanged;
     }
 
     private void ChlorinatorStatus_Loaded(object sender, RoutedEventArgs e)
     {
         UpdateSaltIndicatorLine();
-        Service.ChlorinatorStatus.PropertyChanged += Service_PropertyChanged;
+        Service.MqttModel.PropertyChanged += Service_PropertyChanged;
     }
 
     private void Service_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if(e.PropertyName == nameof(Service.ChlorinatorStatus.SaltLevel))
+        if(e.PropertyName == nameof(Service.MqttModel.ChlorinatorSaltLevel))
         {
             UpdateSaltIndicatorLine();
         }
@@ -51,6 +51,7 @@ public sealed partial class ChlorinatorStatus : UserControl
     {
         UpdateSaltIndicatorLine();
     }
+
     private void UpdateSaltIndicatorLine()
     { 
         if (Service != null)
@@ -58,7 +59,7 @@ public sealed partial class ChlorinatorStatus : UserControl
             double min = 2600;
             double max = 4700;
             double range = max - min;
-            var fraction = (Service.ChlorinatorStatus.SaltLevel - min) / range;
+            var fraction = (Service.MqttModel.ChlorinatorSaltLevel - min) / range;
             SaltIndicatorLine.Margin = new Thickness(fraction * (SaltIndicatorGrid.ActualWidth) - SaltIndicatorLine.ActualWidth*.5, -2, 0, -2);
         }
     }
