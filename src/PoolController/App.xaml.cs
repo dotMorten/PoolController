@@ -91,6 +91,8 @@ public partial class App : Application
             builder.AddConsole();
 #endif
 
+            builder.AddProvider(new Log.LoggerProvider());
+
             // Exclude logs below this level
             builder.SetMinimumLevel(LogLevel.Information);
 

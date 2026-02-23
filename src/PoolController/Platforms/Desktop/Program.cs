@@ -8,6 +8,12 @@ internal class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        Log.PurgeLogFile();
+        Log.LogMessage("**********************************\nStarting up Pool Controller\n**********************************");
+
+
+        AppDomain.CurrentDomain.UnhandledException += (sender, e) => FatalExceptionObject(e.ExceptionObject);
+
         App.InitializeLogging();
 
         var host = UnoPlatformHostBuilder.Create()
@@ -23,5 +29,17 @@ internal class Program
             fbh.DisplayScale = 2;
         }
         host.Run();
+    }
+
+    private static void FatalExceptionObject(object exceptionObject)
+    {
+        if (exceptionObject is Exception ex)
+        {
+            Log.LogError($"{ex.Message}\n{ex.StackTrace}");
+        }
+        else
+        {
+            Log.LogError($"Unknown Fatal exception:{exceptionObject}");
+        }
     }
 }
