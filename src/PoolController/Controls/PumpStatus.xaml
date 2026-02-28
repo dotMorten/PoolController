@@ -30,7 +30,7 @@
                     <TextBlock Text="{x:Bind Service.MqttModel.Mode, Mode=OneWay}" Opacity="0.75"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Top" HorizontalAlignment="Right">
-                    <TextBlock Text="{x:Bind Service.MqttModel.State, Mode=OneWay}" Opacity="0.75"/>
+                    <!-- <TextBlock Text="{x:Bind Service.MqttModel.State, Mode=OneWay}" Opacity="0.75"/> -->
                     <Ellipse Width="8" Height="8" Fill="Green"/>
                 </StackPanel>
 
@@ -108,11 +108,12 @@
                     Grid.RowSpan="3"
                     Tapped="Border_Tapped"
                     />
-        </Grid>
-        <Grid Background="#33ff0000" Margin="-2" BorderBrush="Red" CornerRadius="16" BorderThickness="2" Visibility="{x:Bind Service.IsPumpInServiceMode, Mode=OneWay}" IsHitTestVisible="False">
-            <TextBlock HorizontalAlignment="Center" Foreground="#AAFF0000"
-                           VerticalAlignment="Bottom" Margin="0,0,0,-6" FontWeight="Bold" FontSize="38"
+
+            <Grid Background="#33ff0000" Grid.RowSpan="3" Margin="-12" CornerRadius="2" Visibility="{x:Bind Service.IsPumpInServiceMode, Mode=OneWay}" IsHitTestVisible="False">
+                <TextBlock HorizontalAlignment="Center" Foreground="#AAFF0000"
+                           VerticalAlignment="Center" Margin="0,0,0,-6" FontWeight="Bold" FontSize="38"
                            Text="Service Mode" />
+        </Grid>
         </Grid>
     </Grid>
 </UserControl>

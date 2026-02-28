@@ -109,7 +109,7 @@ public partial class PoolControllerModel : ObservableObject
         // PumpStatus.Ppc = statusMessage.Ppc;
         // PumpStatus.Error = statusMessage.Error;
         Clock = statusMessage.Clock;
-        State = statusMessage.State;
+        // State = statusMessage.State;
         Running = statusMessage.Run;
         Mode = statusMessage.Mode;
         Timer = statusMessage.Timer;
@@ -138,8 +138,8 @@ public partial class PoolControllerModel : ObservableObject
     [ObservableProperty]
     private TimeSpan _timer;
 
-    [ObservableProperty]
-    private Pentair.PumpState _state = Pentair.PumpState.Normal;
+    //[ObservableProperty]
+    //private Pentair.PumpState _state = Pentair.PumpState.Normal;
 
     [ObservableProperty]
     private Pentair.PumpRunning _running = Pentair.PumpRunning.Stopped;
