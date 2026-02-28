@@ -30,7 +30,7 @@
                     <TextBlock Text="{x:Bind Service.MqttModel.Mode, Mode=OneWay}" Opacity="0.75"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Top" HorizontalAlignment="Right">
-                    <!-- <TextBlock Text="{x:Bind Service.MqttModel.State, Mode=OneWay}" Opacity="0.75"/> -->
+                    <TextBlock Text="{x:Bind Service.ActiveProgram, Mode=OneWay}" Opacity="0.75"/>
                     <Ellipse Width="8" Height="8" Fill="Green"/>
                 </StackPanel>
 
@@ -61,7 +61,7 @@
 
                 <TextBlock Grid.Row="1" Text="{x:Bind Service.MqttModel.Running, Mode=OneWay}" HorizontalAlignment="Center" Opacity="0.65" FontSize="12"/>
             </Grid>
-            <TextBlock Text="{x:Bind Service.MqttModel.Timer, Mode=OneWay}" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Opacity="0.65" FontSize="12"/> "
+            <TextBlock Text="{x:Bind Service.TimeRemaining, Mode=OneWay}" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Opacity="0.65" FontSize="12"/> "
 
             <!-- Watts secondary -->
             <Grid Grid.Row="2" RowSpacing="6">

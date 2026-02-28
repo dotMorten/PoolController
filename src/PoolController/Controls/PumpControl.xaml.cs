@@ -69,6 +69,7 @@ public sealed partial class PumpControl : UserControl
             else
             {
                 stopButton.Content = "Stopping...";
+                Service.CancelProgram();
                 await Service.PentairClient.Stop(Pentair.Client.Pump1);
             }
             await Task.Delay(500);
@@ -88,10 +89,10 @@ public sealed partial class PumpControl : UserControl
 
     private async void program1Button_Click(object sender, RoutedEventArgs e)
     {
-        await Service.PentairClient.StartLocalProgram(Pentair.Client.Pump1, 1);
+        Service.StartLocalProgram(4, TimeSpan.FromHours(1, 1));
         //Service.PentairClient?.SendCommandAsync(Pentair.Client.Pump1, Pentair.Client.StartProgram2);
         await Task.Delay(500);
 
-        _ = Service.PentairClient.SendCommandAsync(Pentair.Client.Pump1, Pentair.Client.RequestStatus);
+        //_ = Service.PentairClient.SendCommandAsync(Pentair.Client.Pump1, Pentair.Client.RequestStatus);
     }
 }

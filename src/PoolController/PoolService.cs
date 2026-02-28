@@ -227,7 +227,53 @@ public partial class PoolService : ObservableObject
         }
     }
 
+    public bool IsPumpRemoteControlled
+    {
+        get
+        {
+            if (IsPumpInServiceMode)
+                return false;
+            return IsUserActive || IsProgramRunning;
+        }
+    }
+
+    public bool IsProgramRunning => _activeProgram != null && _activeProgram.TimeRemaining > TimeSpan.Zero;
+
+    public bool IsUserActive {get;set;}
+
     private CancellationTokenSource? pentairCts;
+
+    private  class PumpProgram
+    {
+        public byte ProgramId { get; set; } = 1;
+        public bool IsLocalProgram { get; set; }
+        public DateTime EndTime {get; set;}
+        public TimeSpan TimeRemaining => EndTime - DateTime.Now;
+
+        public override string ToString()
+        {
+            if (IsLocalProgram)
+                return $"Speed {ProgramId}";
+            return $"Program {ProgramId})";
+        }
+    }
+
+    private PumpProgram? _activeProgram;
+
+    public string ActiveProgram => _activeProgram?.ToString() ?? "";
+
+    public string TimeRemaining
+    {
+        get
+        {
+            var time = _activeProgram?.TimeRemaining ?? MqttModel.Timer;
+            if(time <= TimeSpan.Zero)
+                return "";
+            if (time.TotalHours < 1)
+                return $"{time.Minutes}m";
+                return $"{(int)time.Hours}h {time.Minutes}m";
+        }
+    }
 
     private async void PentairClientLoop(CancellationToken cancellationToken)
     {
@@ -240,14 +286,83 @@ public partial class PoolService : ObservableObject
             try
             {
                 await PentairClient.SendCommandAsync(0x60, Client.RequestStatus);
-                if (IsPumpInServiceMode) // turn panel control back on after getting status
+                if (_activeProgram != null)
+                {
+                    if (_activeProgram?.TimeRemaining > TimeSpan.FromMinutes(1))
+                    {
+                        RunProgram(_activeProgram);
+                        OnPropertyChanged(nameof(TimeRemaining));
+                    }
+                    else
+                    {
+                        _activeProgram = null;
+                        OnPropertyChanged(nameof(ActiveProgram));
+                        OnPropertyChanged(nameof(TimeRemaining));
+                        await PentairClient.SendCommandAsync(0x60, Client.PanelControlOn);
+                    }
+                }
+                if (!IsPumpRemoteControlled) // turn panel control back on after getting status
                     await PentairClient.SendCommandAsync(0x60, Client.PanelControlOn);
             }
             catch
             {
                 // Ignore errors for now
             }
-            await Task.Delay(IsPumpInServiceMode ? 60000 : 10000);
+            await Task.Delay(IsProgramRunning ? 2000 : IsPumpRemoteControlled ? 10000 : 60000);
+        }
+    }
+
+    public async void StartLocalProgram(byte programId, TimeSpan duration)
+    {
+        _activeProgram = new PumpProgram
+        {
+            ProgramId = programId,
+            IsLocalProgram = true,
+            EndTime = DateTime.Now.Add(duration)
+        };
+        PentairClient?.SendCommandAsync(Client.Pump1, Client.StartCommand);
+        RunProgram(_activeProgram);
+        OnPropertyChanged(nameof(ActiveProgram));
+        OnPropertyChanged(nameof(TimeRemaining));
+        await Task.Delay(500);
+        _ = PentairClient?.SendCommandAsync(Pentair.Client.Pump1, Pentair.Client.RequestStatus);
+    }
+
+    public async void StartExternalProgram(byte programId, TimeSpan duration)
+    {
+        _activeProgram = new PumpProgram
+        {
+            ProgramId = programId,
+            IsLocalProgram = false,
+            EndTime = DateTime.Now.Add(duration)
+        };
+        PentairClient?.SendCommandAsync(Client.Pump1, Client.StartCommand);
+        RunProgram(_activeProgram);
+        OnPropertyChanged(nameof(ActiveProgram));
+        OnPropertyChanged(nameof(TimeRemaining));
+        await Task.Delay(500);
+        _ = PentairClient?.SendCommandAsync(Pentair.Client.Pump1, Pentair.Client.RequestStatus);
+    }
+
+    public void CancelProgram()
+    {
+        _activeProgram = null;
+        PentairClient?.SendCommandAsync(Client.Pump1, Client.StopCommand);
+        OnPropertyChanged(nameof(ActiveProgram));
+        OnPropertyChanged(nameof(TimeRemaining));
+    }
+
+    private void RunProgram(PumpProgram activeProgram)
+    {
+        if(PentairClient is null)
+            return;
+        if (activeProgram.IsLocalProgram)
+        {
+            _ = PentairClient.StartLocalProgram(Client.Pump1, activeProgram.ProgramId);
+        }
+        else
+        {
+            _ = PentairClient.StartExternalProgram(Client.Pump1, activeProgram.ProgramId);
         }
     }
 
@@ -258,13 +373,19 @@ public partial class PoolService : ObservableObject
             // Handle status message
             if (e.Source == 0x60) // Pump 1
             {
+               var time = MqttModel.Timer;
                MqttModel.UpdatePumpStatus(statusMessage);
+               MqttModel.Timer = _activeProgram?.TimeRemaining ?? statusMessage.Timer;
                DispatcherQueue?.TryEnqueue(() =>
                {
                    if (MqttModel.Clock.Hour != DateTime.Now.Hour || Math.Abs(MqttModel.Clock.Minute - DateTime.Now.Minute - DateTime.Now.Second / 60d) > 1.5)
                    {
                        // Clock is off, update it
                        _ = PentairClient?.SetPumpClock(Pentair.Client.Pump1, (byte)DateTime.Now.Hour, (byte)DateTime.Now.Minute);
+                   }
+                   if (time != statusMessage.Timer)
+                   {
+                        OnPropertyChanged(nameof(TimeRemaining));
                    }
                });
             }
