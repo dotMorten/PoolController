@@ -112,7 +112,7 @@ public partial class PoolControllerModel : ObservableObject
         // State = statusMessage.State;
         Running = statusMessage.Run;
         Mode = statusMessage.Mode;
-        Timer = statusMessage.Timer;
+        // Timer = statusMessage.Timer;
     }
 
     #region Pump
