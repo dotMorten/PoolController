@@ -15,6 +15,7 @@ public sealed partial class MainPage : Page
         screenOffTimer.Interval = TimeSpan.FromSeconds(60);
         screenOffTimer.Tick += (s, e) =>
         {
+            PoolService.Instance.IsUserActive = false;
             TurnOffScreen();
         };
         LayoutRoot.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(RootPointerMoved), true);
@@ -62,6 +63,7 @@ public sealed partial class MainPage : Page
         screenOffTimer.Stop();
         screenOffTimer.Start();
         TurnOnScreen();
+        PoolService.Instance.IsUserActive = true;
     }
 
 

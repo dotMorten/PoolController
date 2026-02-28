@@ -167,7 +167,7 @@ public class Client : IDisposable
 
     public Task StartLocalProgram(byte pumpId, byte program)
     {
-        var cmd = new byte[] { SourceAddress, 0x05, 0x01,  program };
+        var cmd = new byte[] { SourceAddress, 0x05, 0x01,  (byte)(program + 1) };
         return SendCommandAsync(pumpId, cmd);
     }   
 
