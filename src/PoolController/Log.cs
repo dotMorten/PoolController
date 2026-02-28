@@ -58,29 +58,32 @@ internal static class Log
 
     public static void LogMessage(string message)
     {
-        if (Console.IsOutputRedirected)
-            return;
-        Console.WriteLine(message);
+        if (!Console.IsOutputRedirected)
+        {
+            Console.WriteLine(message);
+        }
         WriteToLog(message);
     }
 
     public static void LogWarning(string message)
     {
-        if (Console.IsOutputRedirected)
-            return;
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.Error.WriteLine(message);
-        Console.ResetColor();
+        if (!Console.IsOutputRedirected)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Error.WriteLine(message);
+            Console.ResetColor();
+        }
         WriteToLog("WARNING: " + message);
     }
 
     public static void LogError(string message)
     {
-        if (Console.IsOutputRedirected)
-            return;
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.Error.WriteLine(message);
-        Console.ResetColor();
+        if (!Console.IsOutputRedirected)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Error.WriteLine(message);
+            Console.ResetColor();
+        }
         WriteToLog("ERROR: " + message);
     }
 
@@ -90,7 +93,7 @@ internal static class Log
     {
         lock (logfileLock)
         {
-            File.WriteAllText(LogFileName, $"{DateTime.Now.ToString("s", CultureInfo.InvariantCulture)}: {text}\n");
+            File.AppendAllText(LogFileName, $"{DateTime.Now.ToString("s", CultureInfo.InvariantCulture)}: {text}\n");
         }
     }
 

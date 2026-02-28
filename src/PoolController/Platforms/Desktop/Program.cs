@@ -10,6 +10,7 @@ internal class Program
     {
         Log.PurgeLogFile();
         Log.LogMessage("**********************************\nStarting up Pool Controller\n**********************************");
+        System.Console.WriteLine("Writing log to " + Log.LogFileName);
 
 
         AppDomain.CurrentDomain.UnhandledException += (sender, e) => FatalExceptionObject(e.ExceptionObject);

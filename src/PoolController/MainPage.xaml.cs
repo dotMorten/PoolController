@@ -68,24 +68,46 @@ public sealed partial class MainPage : Page
     public void TurnOffScreen()
     {
         TouchLayer.Visibility = Visibility.Visible;
-        SetBrightness(0);
+        SetBrightness(0f);
     }
 
     public void TurnOnScreen()
     {
         TouchLayer.Visibility = Visibility.Collapsed;
-        SetBrightness(255);
+        SetBrightness(1f);
     }
 
-    static byte brightness = 0;
-    public static void SetBrightness(byte b)
+   
+    static float brightness = 0;
+    static int maxBrightness = -1;
+    public static void SetBrightness(float b)
     {
         if(brightness == b)
             return;
         brightness = b;
         if (!System.OperatingSystem.IsLinux())
             return;
-        string command = $"echo {b} | sudo tee /sys/class/backlight/*/brightness";   
+        byte bb = 0;
+        if (b > 0)
+        {
+            if (maxBrightness <= -1)
+            {
+                if (File.Exists("/sys/class/backlight/*/max_brightness") &&
+                int.TryParse(File.ReadAllText("/sys/class/backlight/*/max_brightness"), out int max))
+                {
+                    maxBrightness = max;
+                }
+            }
+            if (maxBrightness > 0)
+            {
+                bb = (byte)(maxBrightness * b);
+            }
+            else
+            {
+                bb = 31; // This is max for Raspberry Pi Touch 2 screen.
+            } 
+        }
+        string command = $"echo {bb} | sudo tee /sys/class/backlight/*/brightness";   
         System.Diagnostics.Process.Start("bash", $"-c \"{command}\"");
     }
 }
