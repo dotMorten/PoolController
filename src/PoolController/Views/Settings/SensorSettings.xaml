@@ -12,17 +12,17 @@
 
     <StackPanel Spacing="12">
         <TextBlock Text="Temperature Sensors" FontWeight="DemiBold" />
-        <Grid RowSpacing="12" ColumnSpacing="6" ColumnDefinitions="125,*,135,50" RowDefinitions="Auto,Auto,Auto,Auto">
+        <Grid RowSpacing="12" ColumnSpacing="6" ColumnDefinitions="125,*,135,60" RowDefinitions="Auto,Auto,Auto,Auto">
 
             <TextBlock Text="Sensor 1" Grid.Row="0" VerticalAlignment="Center" />
             <TextBlock Text="Sensor 2" Grid.Row="1" VerticalAlignment="Center" />
             <TextBlock Text="Sensor 3" Grid.Row="2" VerticalAlignment="Center" />
             <TextBlock Text="Sensor 4" Grid.Row="3" VerticalAlignment="Center" />
 
-            <TextBlock Text="{x:Bind Sensors.Temperature1.ToString('0.0°F'), Mode=OneWay}" Grid.Row="0" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="16" />
-            <TextBlock Text="{x:Bind Sensors.Temperature2.ToString('0.0°F'), Mode=OneWay}" Grid.Row="1" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="16" />
-            <TextBlock Text="{x:Bind Sensors.Temperature3.ToString('0.0°F'), Mode=OneWay}" Grid.Row="2" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="16" />
-            <TextBlock Text="{x:Bind Sensors.Temperature4.ToString('0.0°F'), Mode=OneWay}" Grid.Row="3" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="16" />
+            <TextBlock Text="{x:Bind Sensors.Temperature1Raw.ToString('0.0°F'), Mode=OneWay}" Grid.Row="0" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="16" />
+            <TextBlock Text="{x:Bind Sensors.Temperature2Raw.ToString('0.0°F'), Mode=OneWay}" Grid.Row="1" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="16" />
+            <TextBlock Text="{x:Bind Sensors.Temperature3Raw.ToString('0.0°F'), Mode=OneWay}" Grid.Row="2" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="16" />
+            <TextBlock Text="{x:Bind Sensors.Temperature4Raw.ToString('0.0°F'), Mode=OneWay}" Grid.Row="3" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="16" />
 
             <ComboBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" x:Name="Sensor1Selector" SelectionChanged="Sensor1SelectionChanged">
                 <ComboBoxItem>Disabled</ComboBoxItem>

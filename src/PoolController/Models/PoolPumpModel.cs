@@ -51,9 +51,13 @@ public partial class PoolControllerModel : ObservableObject
             case TemperatureSensorType.SolarAirTemperature:
                 SolarAirTemperature = temp; break;
             case TemperatureSensorType.WaterTemperature:
-                WaterTemperature = temp; break;
+                if(this.PumpSpeed > 0)
+                    WaterTemperature = temp; // Don't report changes if pump isn't running, since they are likely inaccurate due to stratification. Instead, only update when pump is running, which will mix the water and give a more accurate reading.
+                break;
             case TemperatureSensorType.ReturnTemperature:
-                ReturnWaterTemperature = temp; break;
+                if(this.PumpSpeed > 0)
+                    ReturnWaterTemperature = temp; // Don't report changes if pump isn't running, since they are likely inaccurate due to stratification. Instead, only update when pump is running, which will mix the water and give a more accurate reading.
+                break;
         }
     }
 

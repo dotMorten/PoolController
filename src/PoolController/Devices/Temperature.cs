@@ -98,6 +98,13 @@ public class Temperature : INotifyPropertyChanged
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Temperature4)));
                 });
             }
+            DispatcherQueue?.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Temperature1Raw)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Temperature2Raw)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Temperature3Raw)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Temperature4Raw)));
+                });
             await Task.Delay(5000).ConfigureAwait(false);
         }
     }
@@ -112,16 +119,20 @@ public class Temperature : INotifyPropertyChanged
     private double _temperature1 = double.NaN;
     public double Temperature1 { get => _temperature1 + Settings.Instance.TempSettings.Temp1Offset; }
 
+    public double Temperature1Raw { get => samples1.LastOrDefault() + Settings.Instance.TempSettings.Temp1Offset; }
     private double _temperature2 = double.NaN;
     public double Temperature2 { get => _temperature2 + Settings.Instance.TempSettings.Temp2Offset; }
+    public double Temperature2Raw { get => samples2.LastOrDefault() + Settings.Instance.TempSettings.Temp2Offset; }
 
     private double _temperature3 = double.NaN;
     public double Temperature3 { get => _temperature3 + Settings.Instance.TempSettings.Temp3Offset; }
+    public double Temperature3Raw { get => samples3.LastOrDefault() + Settings.Instance.TempSettings.Temp3Offset; }
 
     private double _temperature4 = double.NaN;
     public double Temperature4 { get => _temperature4 + Settings.Instance.TempSettings.Temp4Offset; }
+    public double Temperature4Raw { get => samples4.LastOrDefault() + Settings.Instance.TempSettings.Temp4Offset; }
 
-    private static double GetRollingAverage(Queue<double> samples, double newSample, int maxSamples = 30)
+    private static double GetRollingAverage(Queue<double> samples, double newSample, int maxSamples = 10)
     {
         if (double.IsNaN(newSample))
             return double.NaN;
@@ -148,7 +159,7 @@ public class Temperature : INotifyPropertyChanged
     public static Temperature Instance { get; } = new Temperature();
 
     // Constants for thermistor calculation
-    private const double SupplyVoltageMv = 3300.0; // millivolts
+    private const double SupplyVoltageMv = 5000.0; // millivolts
     private const double FixedResistorOhms = 10000.0; // ohms
     private const double ReferenceResistanceOhms = 10000.0; // ohms
     private const double BetaCoefficient = 3950.0; // beta value
